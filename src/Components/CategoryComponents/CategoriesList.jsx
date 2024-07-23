@@ -211,7 +211,7 @@ const CategoriesList = () => {
               </li>
               <li
                 onClick={() => {
-                  deleteCategory(elem._id);
+                  deleteCategory(elem?._id);
                 }}
               >
                 <Link className="dropdown-item border-radius-md" to="#">

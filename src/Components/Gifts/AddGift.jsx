@@ -5,18 +5,18 @@ import useSession, { deleteSession } from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
 import { AddData } from "../../Apis/Setters/AddData";
 import SunEditor from "suneditor-react";
+// import axios from "axios";
 
-const AddProducts = () => {
+const AddGift = () => {
   // const [description, setDescription] = useState('')
   const [value, setValue] = useState();
   const [videoLink, setVideoLink] = useState("");
   // const [selectedImages, setSelectedImages] = useState([]);
   const [singleImage, setSingleImage] = useState([]);
-  const [multiImage, setMultiImage] = useState([]);
+  // const [multiImage, setMultiImage] = useState([]);
   // const [allImage, setAllImage] = useState([])
 
   const imageRef = useRef();
-  const cateRef = useRef();
 
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
@@ -43,29 +43,8 @@ const AddProducts = () => {
     "Serif",
     "Times New Roman",
     "Helvetica",
-    "Kurti Dev 010",
-    "Noto Sans Devanagari",
     ...defaultFonts,
   ].sort();
-
-  const handleInsertDocument = () => {
-    return `<div style="border: 1px solid #000; padding: 10px;">
-        <h2>Document Title</h2>
-        <p>Document content goes here...</p>
-    </div>`;
-  };
-
-  const customPlugins = {
-    name: "insertDocument",
-    display: "Insert Document",
-    buttonClass: "",
-    iconHTML: "📄",
-    add: function (core, targetElement) {
-      targetElement.addEventListener("click", () => {
-        core.execCommand("insertHTML", false, handleInsertDocument());
-      });
-    },
-  };
 
   const options = {
     buttonList: [
@@ -83,17 +62,14 @@ const AddProducts = () => {
       ["fullScreen", "showBlocks", "codeView"],
       ["preview", "print"],
       ["removeFormat"],
-      ["insertDocument"],
 
       // ['save', 'template'],
       // '/', Line break
     ], // Or Array of button list, eg. [['font', 'align'], ['image']]
     defaultTag: "div",
     minHeight: "300px",
-    defaultStyle: 'font-family: "Noto Sans Devanagari", sans-serif;',
     showPathLabel: false,
     font: sortedFontOptions,
-    plugins: [customPlugins],
   };
 
   // CATEGORY LIST DATA
@@ -112,12 +88,9 @@ const AddProducts = () => {
   const [details, setDetails] = useState({
     name: "",
     file: "",
-    price: "",
     category: [],
-    segment: "",
-    mrp: "",
-    subCategory: "",
-    deliveryType: "",
+    segment: [],
+    subCategory: [],
     description: "",
   });
 
@@ -203,25 +176,9 @@ const AddProducts = () => {
       return {
         ...prev,
         category: value,
-        subCategories,
       };
     });
   };
-
-  const deliveryTypes = [
-    {
-      label: "Local",
-      value: "local",
-    },
-    {
-      label: "Partner",
-      value: "partner",
-    },
-    {
-      label: "Both",
-      value: "both",
-    },
-  ];
 
   // HANDLING  SUB CATEGORIES
   const handleSubCategories = (value) => {
@@ -233,169 +190,152 @@ const AddProducts = () => {
     });
   };
 
-  // HANDLING  DELIVERY TYPE
-  const handleDelivaryType = (value) => {
-    setDetails((prev) => {
-      return {
-        ...prev,
-        deliveryType: value,
-      };
-    });
-  };
-
   // HANDLING CATEGORIES
   const handleSegment = (value) => {
+    console.log(value);
     setDetails((prev) => {
       return {
         ...prev,
         segment: value,
-        // subCategory: ''
       };
     });
-    // setSubCategories([])
   };
 
   //add description
 
   // FILE UPLOAD METHOD(API CALL)
-  // const fileUpload = async (e) => {
-  //   // Getting details field to set image id
-  //   FileUpload({ image: e.target.files[0] })
-  //     .then((res) => {
-  //       console.log("res", res);
-  //       if (res?.data?.status) {
-  //         setDetails({
-  //           ...details,
-  //           file: res?.data?.data,
-  //         });
-  //         setSingleImage([res?.data?.data])
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err, "err");
-  //       if (err?.response?.status == "401") {
-  //         deleteSession("authorization");
-  //         window.location.href = `${process.env.REACT_APP_BASE_URL}`
-  //       } else {
-  //         window.scrollTo(0, 0);
-  //         if (err?.response?.data?.msg) {
-  //           console.log(err?.response?.data?.msg);
-  //           setAlert({
-  //             errStatus: true,
-  //             successStatus: false,
-  //             errMessage: err?.response?.data?.msg,
-  //             successMessage: "",
-  //           });
-  //           setTimeout(() => {
-  //             setAlert({
-  //               errStatus: false,
-  //               successStatus: false,
-  //               errMessage: "",
-  //               successMessage: "",
-  //             });
-  //           }, 2000);
-  //         } else {
-  //           console.log(err?.message);
-  //           setAlert({
-  //             errStatus: true,
-  //             successStatus: false,
-  //             errMessage: err?.message,
-  //             successMessage: "",
-  //           });
-  //           setTimeout(() => {
-  //             setAlert({
-  //               errStatus: false,
-  //               successStatus: false,
-  //               errMessage: "",
-  //               successMessage: "",
-  //             });
-  //           }, 2000);
-  //         }
-  //       }
-  //     });
-  // };
+  const fileUpload = async (e) => {
+    // Getting details field to set image id
+    FileUpload({ image: e.target.files[0] })
+      .then((res) => {
+        console.log("res", res);
+        if (res?.data?.status) {
+          setDetails({
+            ...details,
+            file: res?.data?.data,
+          });
+          setSingleImage([res?.data?.data]);
+        }
+      })
+      .catch((err) => {
+        console.log(err, "err");
+        if (err?.response?.status == "401") {
+          deleteSession("authorization");
+          window.location.href = `${process.env.REACT_APP_BASE_URL}`;
+        } else {
+          window.scrollTo(0, 0);
+          if (err?.response?.data?.msg) {
+            console.log(err?.response?.data?.msg);
+            setAlert({
+              errStatus: true,
+              successStatus: false,
+              errMessage: err?.response?.data?.msg,
+              successMessage: "",
+            });
+            setTimeout(() => {
+              setAlert({
+                errStatus: false,
+                successStatus: false,
+                errMessage: "",
+                successMessage: "",
+              });
+            }, 2000);
+          } else {
+            console.log(err?.message);
+            setAlert({
+              errStatus: true,
+              successStatus: false,
+              errMessage: err?.message,
+              successMessage: "",
+            });
+            setTimeout(() => {
+              setAlert({
+                errStatus: false,
+                successStatus: false,
+                errMessage: "",
+                successMessage: "",
+              });
+            }, 2000);
+          }
+        }
+      });
+  };
   // console.log("det", singleImage);
 
-  const multiFileUpload = async (e) => {
-    // Storing multiple images into array
-    let allInputImages = [...e.target.files];
-    // Fetching access token
-    let token = getSession("authorization");
-    // Declaring empty array variable
-    let img = [];
+  // const multiFileUpload = async (e) => {
+  //   // Storing multiple images into array
+  //   let allInputImages = [...e.target.files];
+  //   // Fetching access token
+  //   let token = getSession("authorization");
+  //   // Declaring empty array variable
+  //   let img = [];
 
-    // Looping through all input images
-    allInputImages.forEach((e) => {
-      // Defining image, image path & module id
-      // console.log(e, "eeeeeeeeeeeeeeeeeee");
-      let file = {
-        images: e,
-        type: "Product",
-        module_id: 1,
-      };
-      // console.log(file?.images, "ddddddddddddddddddddddeeeeeeeeee");
-
-      // Requesting to upload a image
-      FileUpload({ image: file?.images })
-        .then((res) => {
-          console.log(res, "res herer");
-          if (res.data.status) {
-            // Pushing image id to declared array variable
-            img = [...img, res?.data?.data];
-            // Updating details state with images array
-            setDetails({
-              ...details,
-              file: img,
-            });
-            setSingleImage([img]);
-          }
-        })
-        .catch((err) => {
-          console.log(err, "errrorerpeoe");
-          if (err?.response?.status == "401") {
-            deleteSession("authorization");
-            window.location.href = `${process.env.REACT_APP_BASE_URL}`;
-          } else {
-            window.scrollTo(0, 0);
-            if (err?.response?.data?.msg) {
-              console.log(err?.response?.data?.msg);
-              setAlert({
-                errStatus: true,
-                successStatus: false,
-                errMessage: err?.response?.data?.msg,
-                successMessage: "",
-              });
-              setTimeout(() => {
-                setAlert({
-                  errStatus: false,
-                  successStatus: false,
-                  errMessage: "",
-                  successMessage: "",
-                });
-              }, 2000);
-            } else {
-              console.log(err?.message);
-              setAlert({
-                errStatus: true,
-                successStatus: false,
-                errMessage: err?.message,
-                successMessage: "",
-              });
-              setTimeout(() => {
-                setAlert({
-                  errStatus: false,
-                  successStatus: false,
-                  errMessage: "",
-                  successMessage: "",
-                });
-              }, 2000);
-            }
-          }
-        });
-    });
-  };
+  //   // Looping through all input images
+  //   allInputImages.forEach((e) => {
+  //     // Defining image, image path & module id
+  //     let file = {
+  //       images: e,
+  //       type: "Product",
+  //       module_id: 1,
+  //     };
+  //     // Requesting to upload a image
+  //     FileUpload({ image: file.images[0] })
+  //       .then((res) => {
+  //         if (res.data.status) {
+  //           // Pushing image id to declared array variable
+  //           img = [...img, res?.data?.data];
+  //           // Updating details state with images array
+  //           setDetails({
+  //             ...details,
+  //             file: img,
+  //           })
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         if (err?.response?.status == "401") {
+  //           deleteSession("authorization");
+  //           window.location.href = `${process.env.REACT_APP_BASE_URL}`
+  //         } else {
+  //           window.scrollTo(0, 0);
+  //           if (err?.response?.data?.msg) {
+  //             console.log(err?.response?.data?.msg);
+  //             setAlert({
+  //               errStatus: true,
+  //               successStatus: false,
+  //               errMessage: err?.response?.data?.msg,
+  //               successMessage: "",
+  //             });
+  //             setTimeout(() => {
+  //               setAlert({
+  //                 errStatus: false,
+  //                 successStatus: false,
+  //                 errMessage: "",
+  //                 successMessage: "",
+  //               });
+  //             }, 2000);
+  //           } else {
+  //             console.log(err?.message);
+  //             setAlert({
+  //               errStatus: true,
+  //               successStatus: false,
+  //               errMessage: err?.message,
+  //               successMessage: "",
+  //             });
+  //             setTimeout(() => {
+  //               setAlert({
+  //                 errStatus: false,
+  //                 successStatus: false,
+  //                 errMessage: "",
+  //                 successMessage: "",
+  //               });
+  //             }, 2000);
+  //           }
+  //         }
+  //       });
+  //   });
+  // };
   // console.log("details", details);
-  // console.log("details", singleImage);
+  // console.log("details", multiImage);
 
   // HANDLING API CALL METHOD
   const product = async (e) => {
@@ -411,23 +351,15 @@ const AddProducts = () => {
     let token = getSession("authorization");
     console.log("details A", details);
 
-    let credentials = {
-      ...details,
-      file: singleImage[0],
-      description: value,
-      videoUrl: videoLink,
-    };
+    let credentials = { ...details, file: singleImage, description: value };
     console.log("credentials", credentials);
-    AddData({ url: "product/create", cred: credentials, token: token })
+    AddData({ url: "gift-type/create", cred: credentials, token: token })
       .then((res) => {
         // console.log(res);
         window.scrollTo(0, 0);
         setDetails({
           name: "",
-          file: [],
-          price: "",
-          mrp: "",
-          vendorPrice: "",
+          file: "",
           segment: null,
           category: null,
           subCategory: null,
@@ -494,8 +426,6 @@ const AddProducts = () => {
         }
       });
   };
-  // console.log(cateRef.current, 'cateref');
-  // console.log(imageRef.current, 'imgageref');
 
   return (
     <React.Fragment>
@@ -560,7 +490,7 @@ const AddProducts = () => {
                 <div className="row g-4 mb-4">
                   <div className="col-md-6">
                     <label htmlFor="form-product/name" className="form-label">
-                      Product Name
+                      Name
                     </label>
                     <input
                       type="text"
@@ -585,65 +515,12 @@ const AddProducts = () => {
                       className="form-control"
                       name="thumbnail"
                       id="form-productImage/thumbnail"
-                      onChange={multiFileUpload}
+                      onChange={fileUpload}
                       ref={imageRef}
                       required
                     />
                   </div>
-                  <div className="col-md-6">
-                    <label htmlFor="form-product/mrp" className="form-label">
-                      MRP
-                    </label>
-                    <div className="input-group input-group--sa-slug">
-                      <input
-                        type="number"
-                        name="mrp"
-                        className="form-control"
-                        id="form-product/mrp"
-                        aria-describedby="form-product/mrp-addon form-product/mrp-help"
-                        value={details.mrp}
-                        onChange={handleDetails}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="form-product/slug" className="form-label">
-                      Price
-                    </label>
-                    <div className="input-group input-group--sa-slug">
-                      <input
-                        type="number"
-                        name="price"
-                        className="form-control"
-                        id="form-product/price"
-                        aria-describedby="form-product/price-addon form-product/price-help"
-                        value={details.price}
-                        onChange={handleDetails}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="form-product/vendorprice"
-                      className="form-label"
-                    >
-                      Vendor Price
-                    </label>
-                    <div className="input-group input-group--sa-slug">
-                      <input
-                        type="number"
-                        name="vendorPrice"
-                        className="form-control"
-                        id="form-product/vendorprice"
-                        aria-describedby="form-product/vendorprice-addon form-product/vendorprice-help"
-                        value={details.vendorPrice}
-                        onChange={handleDetails}
-                        required
-                      />
-                    </div>
-                  </div>
+
                   <div className="col-md-6">
                     <label
                       htmlFor="form-productImage/thumbnail"
@@ -660,7 +537,7 @@ const AddProducts = () => {
                       options={segmentList}
                       className="p-0 mb-4"
                       value={details?.segment}
-                      // onClick={() => cateRef('')}
+                      mode="tags"
                     />
                   </div>
                   <div className="col-md-6">
@@ -671,15 +548,15 @@ const AddProducts = () => {
                       Category
                     </label>
                     <Select
-                      mode="multiple"
+                      // mode="multiple"
                       allowClear
                       style={{ width: "100%" }}
                       placeholder="Select Categories"
                       onChange={handleCategories}
                       options={categoriesList}
                       className="p-0 mb-4"
-                      ref={cateRef}
                       value={details?.category}
+                      mode="tags"
                     />
                   </div>
                   <div className="col-md-6">
@@ -690,7 +567,6 @@ const AddProducts = () => {
                       Sub Category
                     </label>
                     <Select
-                      // mode="multiple"
                       allowClear
                       style={{ width: "100%" }}
                       placeholder="Select Categories"
@@ -698,82 +574,11 @@ const AddProducts = () => {
                       options={subCategoriesList}
                       className="p-0 mb-4"
                       value={details?.subCategory}
+                      mode="tags"
                     />
                   </div>
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="form-productImage/thumbnail"
-                      className="form-label"
-                    >
-                      Thumbnail Images
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="form-control"
-                      name="multiimages"
-                      id="form-productImage/thumbnail"
-                      onChange={multiFileUpload}
-                      ref={imageRef}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="form-productImage/thumbnail"
-                      className="form-label"
-                    >
-                      Instriction Video
-                    </label>
-                    <input
-                      placeholder="Video Link here"
-                      type="text"
-                      value={videoLink}
-                      className="form-control"
-                      name="videoUrl"
-                      onChange={(e) => setVideoLink(e.target.value)}
-                    />
-                  </div>
-                  {/* <div className="col-md-6">
-                    <label htmlFor="form-product/vendorprice" className="form-label">
-                      Add Rating
-                    </label>
-                    <div className="input-group input-group--sa-slug">
-                      <input
-                        type="number"
-                        name="add_review"
-                        className="form-control"
-                        id="form-product/add_review"
-                        aria-describedby="form-product/add_review-addon form-product/add_review-help"
-                        min={0}
-                        max={5}
-                        // maxLength={5}
-                        // value={details.vendorPrice}
-                        // onChange={handleDetails}
-                        required
-                      />
-                    </div>
-                  </div> */}
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="form-productImage/type"
-                      className="form-label"
-                    >
-                      Delivery Type
-                    </label>
-                    <Select
-                      // mode="multiple"
-                      allowClear
-                      style={{ width: "100%" }}
-                      placeholder="Select Delivery Type"
-                      onChange={handleDelivaryType}
-                      options={deliveryTypes}
-                      className="p-0 mb-4"
-                      required
-                      value={details?.deliveryType}
-                    />
-                  </div>
-                  <div className="col-md-12">
+
+                  {/* <div className="col-md-12">
                     <label htmlFor="decription" className="form-label">
                       Description
                     </label>
@@ -782,13 +587,13 @@ const AddProducts = () => {
                       setContents={value}
                       onChange={(content) => setDescription(content)}
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <div className="text-center">
                   <input
                     type="submit"
                     className="btn btn-outline-primary btn-sm mb-0 px-5"
-                    value="Add Product"
+                    value="Add Event"
                   />
                 </div>
               </div>
@@ -800,4 +605,4 @@ const AddProducts = () => {
   );
 };
 
-export default AddProducts;
+export default AddGift;

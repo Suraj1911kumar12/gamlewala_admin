@@ -2,13 +2,14 @@ import { Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
 import { EditData } from "../../Apis/Setters/EditData";
 import { AddData } from "../../Apis/Setters/AddData";
 
 const EditFestival = () => {
+    const navigate = useNavigate()
     const params = useParams();
     // SESSION CUSTOM HOOK
     const [setSession, getSession] = useSession();
@@ -34,6 +35,7 @@ const EditFestival = () => {
         name: "",
         date: "",
         description: "",
+        img: ""
     });
 
     let token = getSession("authorization");
@@ -60,6 +62,7 @@ const EditFestival = () => {
                         description: res?.data?.data?.description,
                         date: formatDate(new Date(res?.data?.data?.date)),
                         isActive: "true",
+                        img: res?.data?.data?.image.url[0]
                     });
                 }
             })
@@ -270,14 +273,17 @@ const EditFestival = () => {
                                         >
                                             Image
                                         </label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="form-control"
-                                            name="image"
-                                            id="form-productImage/thumbnail"
-                                            onChange={fileUpload}
-                                        />
+                                        <div style={{ display: 'flex', gap: "5px" }}>
+                                            <img src={details?.img} alt="" height={50} width={50} />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="form-control"
+                                                name="image"
+                                                id="form-productImage/thumbnail"
+                                                onChange={fileUpload}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="col-md-6">
                                         <label htmlFor="form-product/name" className="form-label">

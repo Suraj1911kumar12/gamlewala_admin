@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 // sign-in page background image
-import Gamla from "../assets/img/gamla/house-plant.png"
+import Gamla from "../assets/img/gamla/house-plant.png";
 // footer component
 import Footer from "../Components/Footer";
 import useSession from "../hooks/session";
@@ -63,9 +63,8 @@ const SignIn = () => {
       .catch((AxiosError) => {
         setLoginErr({
           status: true,
-          message: AxiosError?.response?.data?.msg,
+          message: AxiosError?.response?.data?.msg || "server error",
         });
-        // console.log(AxiosError);
       });
   };
 

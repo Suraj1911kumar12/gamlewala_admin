@@ -6,6 +6,7 @@ import { Select } from "antd";
 import { GetData } from "../../Apis/Getters/GetData";
 
 const AddBanner = () => {
+  const imageRef = useRef()
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -38,7 +39,7 @@ const AddBanner = () => {
     file: "",
     type: "",
     description: "",
-    typeId: ""
+    typeId: "",
   });
 
   // EDITABLE IMAGE STATE
@@ -65,7 +66,7 @@ const AddBanner = () => {
       .catch((error) => {
         console.log(error);
       });
-      const credentials = { segment: "" }  
+    const credentials = { segment: "" }
     AddData({ url: "sub-category/list", cred: credentials, token: token })
       .then((res) => {
         setSub_CategoryList(res.data.data);
@@ -77,21 +78,21 @@ const AddBanner = () => {
 
   //MAPPING CATEGORIES OPTION FOR SELECT
   const category = categoryList?.map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   //MAPPING CATEGORIES OPTION FOR SELECT
   const segment = segmentList?.map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   //MAPPING CATEGORIES OPTION FOR SELECT
   const sub_category = sub_categoryList?.map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   const handleType = (value) => {
     setDetails({
@@ -188,6 +189,7 @@ const AddBanner = () => {
           file: "",
           description: "",
         });
+        imageRef.current.value = ''
         setAlert({
           successStatus: true,
           errStatus: false,
@@ -332,6 +334,7 @@ const AddBanner = () => {
                           name="image"
                           id="form-doctorImage/thumbnail"
                           onChange={fileUpload}
+                          ref={imageRef}
                           required
                         />
                       </div>
@@ -360,6 +363,7 @@ const AddBanner = () => {
                       placeholder="Select Type"
                       onChange={handleType}
                       options={type}
+                      value={details?.type}
                       className="p-0 mt-2"
                       required
                     />
@@ -374,6 +378,8 @@ const AddBanner = () => {
                         placeholder={`Select Segment`}
                         onChange={handleId}
                         options={segment}
+                        // value={details?.}
+
                         className="p-0 mt-2"
                         required
                       />

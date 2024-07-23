@@ -4,29 +4,12 @@ import useColumnSearchProps from "../../hooks/useColumnSearchProps";
 import Datatable from "../DataTableComponent/Datatable";
 import useSession from "../../hooks/session";
 import { AddData } from "../../Apis/Setters/AddData";
+import { Button, Select } from "antd";
+import { UpdateData } from "../../Apis/update/UpdateAPI";
+
+const { Option } = Select
 
 const OrdersList = () => {
-  // Declaring ColumnSearchProps Method
-  const columnSearchProps = useColumnSearchProps();
-
-  //ORDER LIST STATE
-  const [orderListData, setOrderListData] = useState([]);
-  // SESSION CUSTOM HOOK
-  const [setSession, getSession] = useSession();
-
-  useEffect(() => {
-    let token = getSession("authorization");
-    AddData({ url: "order", token: token })
-      .then((res) => {
-        console.log("res of orders", res);
-        setOrderListData(res.data.data);
-      })
-      .catch((error) => {
-        console.log('res error', error);
-      });
-  }, []);
-
-  // ERROR MESSAGE STATE
   const [errMsg, setErrMsg] = useState({
     status: false,
     message: "",
@@ -36,11 +19,98 @@ const OrdersList = () => {
     status: false,
     message: "",
   });
-  // CHANGE CUSTOMER POPUP STATE
-  const [contentStatus, setContentStatus] = useState(false);
+
+  const getOrderApi = () => {
+    let token = getSession("authorization");
+    AddData({ url: "order", token: token })
+      .then((res) => {
+        console.log("res of orders", res);
+        setOrderListData(res.data.data);
+      })
+      .catch((error) => {
+        console.log('res error', error);
+        setErrMsg({
+          status: true,
+          message: error.message || 'error'
+        })
+      });
+  }
+
+  const handleChangeType = (id, value) => {
+    console.log(id);
+    console.log(value);
+
+    const credentials = {
+      id: id,
+      status: value
+    }
+    let token = getSession("authorization");
+
+    try {
+      UpdateData({ url: '/order-status/edit-status', token: token, cred: credentials }).then((res) => {
+        console.log("res of orders", res);
+        // setOrderListData(res.data.data);
+        getOrderApi()
+      })
+        .catch((error) => {
+          setErrMsg({
+            status: true,
+            message: error.response.data.msg || 'error'
+          })
+          console.log('res error', error);
+        });
+    } catch (error) {
+      setErrMsg({
+        status: true,
+        message: error.response.data.msg || 'error'
+      })
+      console.log('res error', error);
+    }
+  }
+
+
+  // const [deliveryStatus, setDeliveryStatus] = useState('Pending')
+
+
+  // Declaring ColumnSearchProps Method
+  const columnSearchProps = useColumnSearchProps();
+
+
+  //ORDER LIST STATE
+  const [orderListData, setOrderListData] = useState([]);
+  // SESSION CUSTOM HOOK
+  const [setSession, getSession] = useSession();
+
+  useEffect(() => {
+    getOrderApi()
+  }, []);
+
+  // ERROR MESSAGE STATE
+
 
   // DESTRUCTURING DATA FOR DATA TABLE
-  const data = [...orderListData.reverse()];
+  const data = [...orderListData];
+
+  const deliveryOption = [
+    {
+      value: 'confirmed',
+      label: 'Order Confirm',
+    },
+    {
+      value: 'processed',
+      label: 'Order Processed',
+      disable: true
+    },
+    {
+      value: 'dispatched',
+      label: 'Order Dispatched',
+    },
+    {
+      value: 'delivered',
+      label: 'Order Delivered',
+    }
+  ]
+
 
   // DEFINING DATA TABLE COLUMNS
   const columns = [
@@ -71,14 +141,14 @@ const OrdersList = () => {
         <span>{elem?.userId?.name}</span>
       ),
     },
-    {
-      title: "CUSTOMER ID",
-      key: "customerId",
-      dataIndex: "customerId",
-      render: (_, elem) => (
-        <span>{elem?.userId?._id}</span>
-      ),
-    },
+    // {
+    //   title: "CUSTOMER ID",
+    //   key: "customerId",
+    //   dataIndex: "customerId",
+    //   render: (_, elem) => (
+    //     <span>{elem?.userId?._id}</span>
+    //   ),
+    // },
     {
       title: "PAYMENT STATUS",
       key: "paymentStatus",
@@ -94,21 +164,72 @@ const OrdersList = () => {
         </div>
       ),
     },
-    {
-      title: "ORDER STATUS",
-      key: "orderStatus",
-      dataIndex: "orderStatus",
-      render: (_, elem) => (
-        <div className=" text-left px-2 py-1">
-          <div className=" text-left">
-            {elem.status == "pending" ?
-              <div className="badge bg-warning">{elem.status}</div>
-              :
-              <div className="badge bg-success">{elem.status}</div>}
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   title: "PAYMENT METHOD",
+    //   key: "paymentStatus",
+    //   dataIndex: "paymentStatus",
+    //   ...columnSearchProps("paymentStatus"),
+    //   render: (_, elem) => (
+    //     <div className=" text-left px-2 py-1">
+    //       <div className=" text-left">{elem.paymentMethod === "COD" ?
+    //         <div className="badge bg-danger">{elem?.paymentMethod || "COD"}</div>
+    //         :
+    //         <div className="badge bg-success">{elem?.paymentMethod || "COD"}</div>}
+    //       </div>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: "ORDER STATUS",
+    //   key: "orderStatus",
+    //   dataIndex: "orderStatus",
+    //   ...columnSearchProps("orderStatus"),
+    //   render: (_, elem) => (
+    //     <div className=" text-left px-2 py-1">
+    //       <div className=" text-left">
+    //         {elem.status == "delivered" ?
+    //           <div className="badge bg-success">{elem.status}</div>
+    //           : elem.status === 'cancelled' ?
+    //             <div className="badge bg-danger">{elem.status}</div>
+    //             :
+    //             <div className="badge bg-warning">{elem.status}</div>
+    //         }
+    //       </div>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: "DELIVERY STATUS",
+    //   key: "orderStatus",
+    //   dataIndex: "orderStatus",
+    //   render: (_, elem) => (
+    //     <div className="  text-left px-2 py-1">
+    //       {
+    //         elem.status == "delivered" ? 'Delivered' :
+    //           elem.status == 'cancelled' ? 'Cancelled' :
+    //             <Select className=""
+    //               placeholder="Select"
+    //               // mode="multiple"
+    //               style={{ width: 150 }} onChange={(value) => handleChangeType(elem?._id, value)}
+    //             //  options={deliveryOption}
+    //             >
+    //               <Option value="confirmed" disabled={elem.status === 'pending' ? false : true} >
+    //                 Order Confirm
+    //               </Option>
+    //               <Option value="processed" disabled={elem.status === 'confirmed' ? false : true}>
+    //                 Order Processed
+    //               </Option>
+    //               <Option value="dispatched" disabled={elem.status === 'processed' ? false : true}>
+    //                 Order Dispatched
+    //               </Option>
+    //               <Option value="delivered" disabled={elem.status === 'dispatched' ? false : true}>
+    //                 Order Delivered
+    //               </Option>
+    //             </Select>
+    //       }
+    //     </div>
+    //   ),
+    // },
     {
       title: "ITEMS",
       key: "orderDetails",
@@ -157,6 +278,7 @@ const OrdersList = () => {
                 View
               </Link>
             </li>
+
           </ul>
         </div>
       ),
@@ -215,7 +337,10 @@ const OrdersList = () => {
               <div className="card-header pb-0">
                 <div className="row">
                   <div className="col-lg-6 col-7">
-                    <h6>Orders List</h6>
+                    <h6>Orders List  </h6>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: "flex-end" }} className="col-lg-6  col-7">
+                    <h6>Total Order: {data?.length} </h6>
                   </div>
                 </div>
               </div>

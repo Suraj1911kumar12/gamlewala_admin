@@ -1,10 +1,12 @@
 import { Select } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
 import useSession, { deleteSession } from "../../hooks/session";
 import { AddData } from "../../Apis/Setters/AddData";
 
 const AddPoojaItem = () => {
+
+  const imageRef = useRef()
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -101,6 +103,7 @@ const AddPoojaItem = () => {
           group: [],
           description: ""
         });
+        imageRef.current.value = ''
         setAlert({
           successStatus: true,
           errStatus: false,
@@ -248,6 +251,7 @@ const AddPoojaItem = () => {
                       name="thumbnail"
                       id="form-productImage/thumbnail"
                       onChange={fileUpload}
+                      ref={imageRef}
                       required
                     />
                   </div>

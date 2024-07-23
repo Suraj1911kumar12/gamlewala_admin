@@ -6,8 +6,22 @@ import PrintOrder from "./PrintOrder";
 import { useParams } from "react-router";
 import useSession from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
+import { Select } from "antd";
+import { UpdateData } from "../../Apis/update/UpdateAPI";
 
 const EditOrder = () => {
+  const { Option } = Select;
+
+  const [errMsg, setErrMsg] = useState({
+    status: false,
+    message: "",
+  });
+  // SUCCESS MESSAGE STATE
+  const [successMsg, setSuccessMsg] = useState({
+    status: false,
+    message: "",
+  });
+
   const params = useParams();
 
   // CHANGE PRINT POPUP STATE
@@ -18,7 +32,69 @@ const EditOrder = () => {
   //ORDER LIST STATE
   const [orderListData, setOrderListData] = useState([]);
 
+  const handleChangeType = (id, value) => {
+    console.log(id);
+    console.log(value);
+
+    const credentials = {
+      id: params.id,
+      productId: id,
+      status: value,
+    };
+    let token = getSession("authorization");
+
+    try {
+      UpdateData({
+        url: "/order-status/edit-status",
+        token: token,
+        cred: credentials,
+      })
+        .then((res) => {
+          console.log("res of orders", res);
+          // setOrderListData(res.data.data);
+          getApi();
+
+          // getOrderApi()
+        })
+        .catch((error) => {
+          setErrMsg({
+            status: true,
+            message: error.response.data.msg || "error",
+          });
+          console.log("res error", error);
+        });
+    } catch (error) {
+      setErrMsg({
+        status: true,
+        message: error.response.data.msg || "error",
+      });
+      console.log("res error", error);
+    }
+  };
+
+  const deliveryOption = [
+    {
+      value: "confirmed",
+      label: "Order Confirm",
+    },
+    {
+      value: "processed",
+      label: "Order Processed",
+    },
+    {
+      value: "dispatched",
+      label: "Order Dispatched",
+    },
+    {
+      value: "delivered",
+      label: "Order Delivered",
+    },
+  ];
   useEffect(() => {
+    getApi();
+  }, []);
+
+  const getApi = () => {
     window.scrollTo(0, 0);
     let token = getSession("authorization");
     GetData({ url: `order/${params.id}`, token: token })
@@ -29,7 +105,7 @@ const EditOrder = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  };
 
   const order = orderListData;
 
@@ -51,13 +127,13 @@ const EditOrder = () => {
               <p className="text-xs font-weight-bold mb-0">
                 {elem?.[index]?.price
                   ? Number(elem?.[index]?.price)?.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "INR",
-                  })
+                      style: "currency",
+                      currency: "INR",
+                    })
                   : Number(elem?.price)?.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "INR",
-                  })}
+                      style: "currency",
+                      currency: "INR",
+                    })}
               </p>
             </td>
             <td className="align-middle text-center text-sm">
@@ -72,16 +148,72 @@ const EditOrder = () => {
               </p>
             </td>
             <td className="align-middle text-center">
-              <p className="text-xs font-weight-bold mb-0">{elem?.gst}%</p>
+              <div className=" text-left px-2 py-1">
+                <div className=" text-left">
+                  {elem.status == "delivered" ? (
+                    <div className="badge bg-success">{elem.status}</div>
+                  ) : elem.status === "cancelled" ? (
+                    <div className="badge bg-danger">{elem.status}</div>
+                  ) : (
+                    <div className="badge bg-warning">{elem.status}</div>
+                  )}
+                </div>
+              </div>
             </td>
-            <td className="text-center">
+            <td className="align-middle text-center">
+              <div className="  text-left px-2 py-1">
+                {elem.status == "delivered" ? (
+                  "Delivered"
+                ) : elem.status == "cancelled" ? (
+                  "Cancelled"
+                ) : (
+                  <Select
+                    className=""
+                    placeholder="Select"
+                    // mode="multiple"
+                    style={{ width: 150 }}
+                    onChange={(value) => handleChangeType(elem?._id, value)}
+                    // options={deliveryOption}
+                  >
+                    <Option
+                      value="confirmed"
+                      disabled={elem?.status == "pending" ? false : true}
+                    >
+                      Order Confirm
+                    </Option>
+                    <Option
+                      value="processed"
+                      disabled={elem?.status == "confirmed" ? false : true}
+                    >
+                      Order Processed
+                    </Option>
+                    <Option
+                      value="dispatched"
+                      disabled={elem?.status == "processed" ? false : true}
+                    >
+                      Order Dispatched
+                    </Option>
+                    <Option
+                      value="delivered"
+                      disabled={elem?.status == "dispatched" ? false : true}
+                    >
+                      Order Delivered
+                    </Option>
+                  </Select>
+                )}
+              </div>
+            </td>
+            {/* <td className="align-middle text-center">
+              <p className="text-xs font-weight-bold mb-0">{elem?.gst}%</p>
+            </td> */}
+            {/* <td className="text-center">
               <span className="text-secondary text-xs font-weight-bold">
                 {total_ammount?.toLocaleString("en-US", {
                   style: "currency",
                   currency: "INR",
                 })}
               </span>
-            </td>
+            </td> */}
           </tr>
         }
       </React.Fragment>
@@ -122,7 +254,7 @@ const EditOrder = () => {
                         <td className="align-middle text-center text-sm">
                           <p className="text-xs font-weight-bold mb-0">
                             Total{" "}
-                            {order?.subTotal?.toLocaleString("en-US", {
+                            {order?.totalPrice?.toLocaleString("en-US", {
                               style: "currency",
                               currency: "INR",
                             })}
@@ -130,7 +262,7 @@ const EditOrder = () => {
                         </td>
                         <td className="align-middle text-center">
                           <span className="badge badge-sm bg-gradient-secondary">
-                            {order?.status}
+                            {order?.paymentMethod}
                           </span>
                         </td>
                       </tr>
@@ -142,7 +274,7 @@ const EditOrder = () => {
           </div>
 
           {/* Order Details */}
-          <div className="col-md-8">
+          <div className="col-md-12">
             <div className="card mb-4">
               <div className="card-header pb-0">
                 <h4>Items table</h4>
@@ -168,11 +300,17 @@ const EditOrder = () => {
                           Price
                         </th>
                         <th className="text-uppercase text-secondary text-xs font-weight-bolder ps-2">
+                          Order Status
+                        </th>
+                        <th className="text-uppercase text-secondary text-xs font-weight-bolder ps-2">
+                          Delivery Status
+                        </th>
+                        {/* <th className="text-uppercase text-secondary text-xs font-weight-bolder ps-2">
                           Tax
-                        </th>
-                        <th className="text-center text-uppercase text-secondary text-xs font-weight-bolder">
+                        </th> */}
+                        {/* <th className="text-center text-uppercase text-secondary text-xs font-weight-bolder">
                           Total Amount
-                        </th>
+                        </th> */}
                       </tr>
                     </thead>
 
@@ -194,7 +332,7 @@ const EditOrder = () => {
                         </td>
                         <td>
                           <p className="font-weight-bold mb-0 text-end pe-4">
-                            {order?.subTotal?.toLocaleString("en-US", {
+                            {order?.totalPrice?.toLocaleString("en-US", {
                               style: "currency",
                               currency: "INR",
                             })}
@@ -235,7 +373,7 @@ const EditOrder = () => {
                           </p>
                         </td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td colSpan={3}>
                           <div className="d-flex px-2 py-1">
                             <div className="d-flex flex-column justify-content-center">
@@ -248,8 +386,8 @@ const EditOrder = () => {
                             {order?.discount}
                           </p>
                         </td>
-                      </tr>
-                      <tr>
+                      </tr> */}
+                      {/* <tr>
                         <td colSpan={3}>
                           <div className="d-flex px-2 py-1">
                             <div className="d-flex flex-column justify-content-center">
@@ -262,7 +400,7 @@ const EditOrder = () => {
                             {order?.tax || '--'}
                           </p>
                         </td>
-                      </tr>
+                      </tr> */}
                       <tr>
                         <td colSpan={3}>
                           <div className="d-flex px-2 py-1">
@@ -273,7 +411,7 @@ const EditOrder = () => {
                         </td>
                         <td>
                           <p className="font-weight-bold mb-0 text-end pe-4">
-                            {order?.subTotal?.toLocaleString("en-US", {
+                            {order?.totalAmountToPay?.toLocaleString("en-US", {
                               style: "currency",
                               currency: "INR",
                             })}
@@ -304,7 +442,6 @@ const EditOrder = () => {
 
                 <div className="row">
                   <div className="mb-4">
-
                     <div className="ps-0">
                       <h6 className="fs-exact-16 mb-0">Name</h6>
                       <div className="pt-1">
@@ -322,7 +459,6 @@ const EditOrder = () => {
                           {orderListData?.userId?.email}
                           <br />
                           {orderListData?.userId?.mobile}
-
                         </p>
                       </div>
                     </div>
@@ -330,8 +466,17 @@ const EditOrder = () => {
                       <h6 className="fs-exact-16 mb-0">Shipping Address</h6>
                       <div className="pt-1">
                         <p className="text-sm mb-1">
-                          {`${orderListData?.shippingAddressId?.houseNo || 'N/A'}, ${orderListData?.shippingAddressId?.street || 'N/A'}, ${orderListData?.shippingAddressId?.city?.name}, ${orderListData?.shippingAddressId?.state?.name}, ${orderListData?.shippingAddressId?.postalCode
-                            }, ${orderListData?.shippingAddressId?.country}`}
+                          {`${
+                            orderListData?.shippingAddressId?.houseNo
+                              ? orderListData?.shippingAddressId?.houseNo + ","
+                              : ""
+                          } ${
+                            orderListData?.shippingAddressId?.street || "N/A"
+                          }, ${orderListData?.shippingAddressId?.city?.name}, ${
+                            orderListData?.shippingAddressId?.state?.name
+                          }, ${orderListData?.shippingAddressId?.postalCode}, ${
+                            orderListData?.shippingAddressId?.country
+                          }`}
                         </p>
                       </div>
                     </div>
@@ -339,8 +484,19 @@ const EditOrder = () => {
                       <h6 className="fs-exact-16 mb-0">Billing Address</h6>
                       <div className="pt-1">
                         <p className="text-sm mb-1">
-                          {`${orderListData?.shippingAddressId?.houseNo || 'N/A'}, ${orderListData?.shippingAddressId?.street || 'N/A'},   ${orderListData?.shippingAddressId?.city?.name}, ${orderListData?.shippingAddressId?.state?.name}, ${orderListData?.shippingAddressId?.postalCode
-                            }, ${orderListData?.shippingAddressId?.country}`}
+                          {`${
+                            orderListData?.shippingAddressId?.houseNo
+                              ? orderListData?.shippingAddressId?.houseNo + ","
+                              : ""
+                          } ${
+                            orderListData?.shippingAddressId?.street || "N/A"
+                          },   ${
+                            orderListData?.shippingAddressId?.city?.name
+                          }, ${
+                            orderListData?.shippingAddressId?.state?.name
+                          }, ${orderListData?.shippingAddressId?.postalCode}, ${
+                            orderListData?.shippingAddressId?.country
+                          }`}
                         </p>
                       </div>
                     </div>

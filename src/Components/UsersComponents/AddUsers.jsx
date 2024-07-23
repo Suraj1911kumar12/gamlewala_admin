@@ -112,7 +112,6 @@ const AddUsers = () => {
     // SETTING VALUE TO STATE VARIABLE
     const handleDetails = (e) => {
         const { name, value } = e.target;
-
         setDetails({
             ...details,
             [name]: value,

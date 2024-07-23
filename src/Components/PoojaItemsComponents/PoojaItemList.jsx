@@ -31,7 +31,7 @@ const PoojaItemList = () => {
   let token = getSession("authorization");
 
   useEffect(() => {
-     GetData({ url: "pooja-element", token: token })
+    GetData({ url: "pooja-element", token: token })
       .then((res) => {
         setEventListData(res.data.data);
       })
@@ -51,9 +51,9 @@ const PoojaItemList = () => {
       dataIndex: "image",
       render: (_, elem) => (
         // <Link href="app-product.html" className="me-4">
-          <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
-            <img src={elem.image} width="40" height="40" alt="" />
-          </div>
+        <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
+          <img src={elem.image} width="40" height="40" alt="" />
+        </div>
         // </Link>
       ),
     },
@@ -63,12 +63,12 @@ const PoojaItemList = () => {
       dataIndex: "name",
       ...columnSearchProps("name"),
     },
-    {
-      title: "DESCRIPTION",
-      key: "description",
-      dataIndex: "description",
-      ...columnSearchProps("description"),
-    },
+    // {
+    //   title: "DESCRIPTION",
+    //   key: "description",
+    //   dataIndex: "description",
+    //   ...columnSearchProps("description"),
+    // },
     {
       title: "STATUS",
       key: "isActive",
@@ -153,7 +153,7 @@ const PoojaItemList = () => {
       .catch((err) => {
         if (err?.response?.status == "401") {
           deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
+          window.location.href = `${process.env.REACT_APP_BASE_URL}`;
         } else {
           window.scrollTo(0, 0);
           if (err?.response?.data?.msg) {
@@ -256,7 +256,7 @@ const PoojaItemList = () => {
               </div>
               <div className="card-body px-0 pb-2">
                 <div className="table-responsive">
-                  {<Datatable data={data} columns={columns}/>}
+                  {<Datatable data={data} columns={columns} />}
                 </div>
               </div>
             </div>

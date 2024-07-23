@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
 import { EditData } from "../../Apis/Setters/EditData";
 import { GetData } from "../../Apis/Getters/GetData";
 
 const EditCoupon = () => {
   const params = useParams();
+  const navigate = useNavigate()
   const [setSession, getSession] = useSession();
 
   // ALERT STATUS & MESSAGE STATE
@@ -91,6 +92,7 @@ const EditCoupon = () => {
           successMessage: res?.data?.msg,
           errMessage: "",
         });
+        navigate('/coupons')
         setTimeout(() => {
           setAlert({
             errStatus: false,
@@ -286,7 +288,7 @@ const EditCoupon = () => {
                   </div>
                 </div>
                 <div className="row g-4 mb-4">
-                <div className="mb-4 col-md-6">
+                  <div className="mb-4 col-md-6">
                     <label htmlFor="form-coupon/total-limit" className="form-label">
                       Total Limit
                     </label>

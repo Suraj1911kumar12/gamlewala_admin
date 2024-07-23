@@ -1,7 +1,7 @@
 import { GetData } from "../../Apis/Getters/GetData";
 import React, { useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
 import { EditData } from "../../Apis/Setters/EditData";
 import { Select } from "antd"
@@ -10,6 +10,8 @@ import { AddData } from "../../Apis/Setters/AddData";
 const EditBanner = () => {
   const params = useParams();
   const [setSession, getSession] = useSession();
+
+  const navigate = useNavigate()
 
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
@@ -43,7 +45,8 @@ const EditBanner = () => {
     type: "",
     typeId: "",
     description: "",
-    isActive: true
+    isActive: true,
+    img: ''
   });
 
   useEffect(() => {
@@ -60,12 +63,15 @@ const EditBanner = () => {
   useEffect(() => {
     if (bannerData) {
       // setEditableImg(bannerData.image);
+      console.log(bannerData);
       setDetails((prevDetails) => ({
+
         ...prevDetails,
         title: bannerData.title,
         type: bannerData.type,
         typeId: bannerData.typeId,
         description: bannerData.description,
+        img: bannerData.image.url[0]
       }));
     }
   }, [bannerData]);
@@ -215,6 +221,7 @@ const EditBanner = () => {
           successMessage: res?.data?.msg,
           errMessage: "",
         });
+        navigate('/banners')
         setTimeout(() => {
           setAlert({
             errStatus: false,
@@ -346,13 +353,16 @@ const EditBanner = () => {
                         </span>
                       </div> */}
                       <div className="col-md-12">
-                        <input
-                          type="file"
-                          className="form-control"
-                          name="image"
-                          id="form-doctorImage/thumbnail"
-                          onChange={fileUpload}
-                        />
+                        <div style={{ display: 'flex', gap: '5px ' }}>
+                          <img src={details?.img} alt="" style={{ height: 50, width: 150 }} />
+                          <input
+                            type="file"
+                            className="form-control"
+                            name="image"
+                            id="form-doctorImage/thumbnail"
+                            onChange={fileUpload}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

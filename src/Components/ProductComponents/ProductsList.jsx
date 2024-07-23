@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Datatable from "../DataTableComponent/Datatable";
-import { Tag } from "antd";
+import { Rate, Tag } from "antd";
 import useColumnSearchProps from "../../hooks/useColumnSearchProps";
 import { AddData } from "../../Apis/Setters/AddData";
 import useSession, { deleteSession } from "../../hooks/session";
@@ -58,7 +58,12 @@ const ProductsList = () => {
       render: (_, elem) => (
         <Link href="app-product.html" className="me-4">
           <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
-            <img src={elem.image} width="40" height="40" alt="" />
+            {
+              elem?.image ?
+                <img src={elem?.image[0]?.url || 'abc.png'} width="40" height="40" alt="" />
+                :
+                <img src={'abc.png'} width="40" height="40" alt="" />
+            }
           </div>
         </Link>
       ),
@@ -93,26 +98,31 @@ const ProductsList = () => {
       dataIndex: "price",
       ...columnSearchProps("price"),
     },
-    // {
-    //   title: "VENDOR PRICE",
-    //   key: "vendorPrice",
-    //   dataIndex: "vendorPrice",
-    //   ...columnSearchProps("vendorPrice"),
-    // },
+
     {
       title: "STATUS",
       key: "status",
       dataIndex: "status",
       render: (_, elem) => (
         <div className=" text-left px-2 py-1">
-          <div className=" text-left">
-            <div className="badge bg-primary">
-              {elem.isActive ? "Active" : "Not Active"}
-            </div>
+          <div className=" text-left">{elem.isActive ?
+            <div className="badge bg-success">{'Active'}</div>
+            :
+            <div className="badge bg-denger">{'In Active'}</div>}
           </div>
         </div>
       ),
     },
+    // {
+    //   title: "Ratings",
+    //   key: "rating",
+    //   dataIndex: "rating",
+    //   render: (_, elem) => (
+    //     <div>
+    //       <Rate disabled defaultValue={2} value={elem?.rating} style={{ height: 1, }} />
+    //     </div>
+    //   ),
+    // },
     {
       title: "ACTION",
       key: "action",

@@ -1,6 +1,6 @@
-import { Select } from "antd";
+import { Collapse, Select } from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
 import { useParams } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
@@ -8,11 +8,17 @@ import { GetData } from "../../Apis/Getters/GetData";
 import { EditData } from "../../Apis/Setters/EditData";
 import { AddData } from "../../Apis/Setters/AddData";
 import SunEditor from "suneditor-react";
+import { Table } from "ant-table-extensions";
+import { DeleteData } from "../../Apis/Setters/DeleteData";
 
 const EditVendorProduct = () => {
   const params = useParams();
   // SESSION CUSTOM HOOK
   const [setSession, getSession] = useSession();
+  const [rejectionStatus, setRejectionStatus] = useState(false);
+
+
+  const [reviewDat, setReviewData] = useState([])
 
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
@@ -96,9 +102,17 @@ const EditVendorProduct = () => {
     stock: "",
     vendorPrice: "",
     isActive: "",
-    file: "",
-    subCategory: ""
+    file: [],
+    subCategory: "",
+    img: '',
   });
+
+  const [rating, setRating] = useState({
+    id: '',
+    rating: 0,
+    comment: "",
+    adminRating: ""
+  })
 
   const deliveryTypes = [{
     label: "Local",
@@ -133,6 +147,7 @@ const EditVendorProduct = () => {
         if (res?.data?.status) {
           setDetails({
             id: params?.id,
+            img: res?.data?.data?.image[0]?.url,
             name: res?.data?.data?.name,
             price: res?.data?.data?.price,
             category: res?.data?.data?.category?._id,
@@ -144,6 +159,11 @@ const EditVendorProduct = () => {
             deliveryType: res?.data?.data?.deliveryType,
             isActive: "true",
           });
+          setRating({
+            id: params?.id,
+            rating: res?.data?.data?.rating,
+            adminRating: res?.data?.data?.adminRating,
+          })
         }
       })
       .catch((error) => {
@@ -156,7 +176,31 @@ const EditVendorProduct = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [alert]);
+  useEffect(() => {
+    getReviewData()
+  }, [])
+
+  const getReviewData = useCallback(() => {
+    try {
+      const credentials = { id: params?.id }
+      AddData({ url: 'reviews', cred: credentials, token: token }).then((res) => {
+        console.log(res)
+        if (res?.data?.status) {
+          setReviewData(res?.data?.data)
+          setRating({
+            id: res?.data?.data?._id,
+            rating: res?.data?.data?.rate,
+            comment: res?.data?.data?.comment
+          })
+        }
+      })
+    } catch (error) {
+      console.log("hallo", error);
+    }
+  }, [])
+
+
 
   useEffect(() => {
     const credentials = { segment: details.segment }
@@ -210,6 +254,14 @@ const EditVendorProduct = () => {
       [name]: value,
     })
   };
+  const handleDetails2 = (e) => {
+    console.log(e.target.name);
+    const { name, value } = e.target;
+    setRating({
+      ...details,
+      [name]: value,
+    })
+  };
 
   // HANDLING CATEGORIES
   const handleCategories = (value) => {
@@ -241,61 +293,136 @@ const EditVendorProduct = () => {
     });
   };
 
-  // FILE UPLOAD METHOD(API CALL)
-  const fileUpload = async (e) => {
-    // Getting details field to set image id
-    FileUpload({ image: e.target.files[0] })
-      .then((res) => {
-        if (res?.data?.status) {
-          setDetails({
-            ...details,
-            file: res?.data?.data,
-          });
-        }
-      })
-      .catch((err) => {
-        if (err?.response?.status == "401") {
-          deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
-        } else {
-          window.scrollTo(0, 0);
-          if (err?.response?.data?.msg) {
-            console.log(err?.response?.data?.msg);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.response?.data?.msg,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
-          } else {
-            console.log(err?.message);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.message,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
-          }
-        }
-      });
-  };
+  // const fileUpload = async (e) => {
+  //   // Getting details field to set image id
+  //   FileUpload({ image: e.target.files })
+  //     .then((res) => {
+  //       if (res?.data?.status) {
+  //         setDetails({
+  //           ...details,
+  //           img: res?.data?.data,
+  //         });
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (err?.response?.status == "401") {
+  //         deleteSession("authorization");
+  //         window.location.href = `${process.env.REACT_APP_BASE_URL}`
+  //       } else {
+  //         window.scrollTo(0, 0);
+  //         if (err?.response?.data?.msg) {
+  //           console.log(err?.response?.data?.msg);
+  //           setAlert({
+  //             errStatus: true,
+  //             successStatus: false,
+  //             errMessage: err?.response?.data?.msg,
+  //             successMessage: "",
+  //           });
+  //           setTimeout(() => {
+  //             setAlert({
+  //               errStatus: false,
+  //               successStatus: false,
+  //               errMessage: "",
+  //               successMessage: "",
+  //             });
+  //           }, 2000);
+  //         } else {
+  //           console.log(err?.message);
+  //           setAlert({
+  //             errStatus: true,
+  //             successStatus: false,
+  //             errMessage: err?.message,
+  //             successMessage: "",
+  //           });
+  //           setTimeout(() => {
+  //             setAlert({
+  //               errStatus: false,
+  //               successStatus: false,
+  //               errMessage: "",
+  //               successMessage: "",
+  //             });
+  //           }, 2000);
+  //         }
+  //       }
+  //     });
+  // };
+  const multiFileUpload = async (e) => {
+    // Storing multiple images into array
+    let allInputImages = [...e.target.files];
+    // Fetching access token
+    // Declaring empty array variable
+    let img = [];
 
+    // Looping through all input images
+    allInputImages.forEach((e) => {
+      // Defining image, image path & module id
+      // console.log(e, "eeeeeeeeeeeeeeeeeee");
+      let file = {
+        images: e,
+        type: "Product",
+        module_id: 1,
+      };
+      // console.log(file?.images, "ddddddddddddddddddddddeeeeeeeeee");
+
+      // Requesting to upload a image
+      FileUpload({ image: file?.images })
+        .then((res) => {
+          console.log(res, "res herer");
+          if (res.data.status) {
+            // Pushing image id to declared array variable
+            img = [...img, res?.data?.data];
+            // Updating details state with images array
+            setDetails({
+              ...details,
+              file: img,
+            })
+            // setSingleImage([img])
+          }
+        })
+        .catch((err) => {
+          console.log(err, 'errrorerpeoe');
+          if (err?.response?.status == "401") {
+            deleteSession("authorization");
+            window.location.href = `${process.env.REACT_APP_BASE_URL}`
+          } else {
+            window.scrollTo(0, 0);
+            if (err?.response?.data?.msg) {
+              console.log(err?.response?.data?.msg);
+              setAlert({
+                errStatus: true,
+                successStatus: false,
+                errMessage: err?.response?.data?.msg,
+                successMessage: "",
+              });
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            } else {
+              console.log(err?.message);
+              setAlert({
+                errStatus: true,
+                successStatus: false,
+                errMessage: err?.message,
+                successMessage: "",
+              });
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            }
+          }
+        });
+    });
+  };
 
   // HANDLING API CALL METHOD
   const update = async (e) => {
@@ -362,6 +489,199 @@ const EditVendorProduct = () => {
         }
       });
   };
+  const handleOpenRating = (id) => {
+    setRejectionStatus(!rejectionStatus)
+    // getReviewData(id)
+    // try {
+    //   const credentials = { id: id }
+    //   AddData({ url: 'reviews', cred: credentials, token: token }).then((res) => {
+    //     console.log(res.data.data, 'wow ')
+
+    //     setRating({
+    //       id: res?.data?.data?.map(elem => elem._id),
+    //       rating: res?.data?.data?.map(elem => elem.rate),
+    //       comment: res?.data?.data?.map(elem => elem.comment)
+    //     })
+    //   })
+    // } catch (error) {
+    //   console.log("hallo", error);
+    // }
+  }
+
+
+  const editRating = (e) => {
+    e.preventDefault()
+    let token = getSession('authorization')
+    let credentials = { id: params?.id, rate: rating?.adminRating }
+
+    console.log(rating, credentials, 'cred');
+    EditData({ url: "reviews/edit-review", cred: credentials, token: token }).then((res) => {
+      window.scrollTo(0, 0);
+      setAlert({
+        successStatus: true,
+        errStatus: false,
+        successMessage: res?.data?.msg,
+        errMessage: "",
+      });
+      setTimeout(() => {
+        setAlert({
+          errStatus: false,
+          successStatus: false,
+          errMessage: "",
+          successMessage: "",
+        });
+      }, 1000);
+      setRejectionStatus(!rejectionStatus)
+    })
+      .catch((err) => {
+        if (err?.response?.status == "401") {
+          deleteSession("authorization");
+          window.location.href = `${process.env.REACT_APP_BASE_URL}`
+        } else {
+          window.scrollTo(0, 0);
+          if (err?.response?.data?.msg) {
+            console.log(err?.response?.data?.msg);
+            setAlert({
+              errStatus: true,
+              successStatus: false,
+              errMessage: err?.response?.data?.msg,
+              successMessage: "",
+            });
+            setTimeout(() => {
+              setAlert({
+                errStatus: false,
+                successStatus: false,
+                errMessage: "",
+                successMessage: "",
+              });
+            }, 2000);
+          } else {
+            console.log(err);
+            setAlert({
+              errStatus: true,
+              successStatus: false,
+              errMessage: err?.response?.data?.errors,
+              successMessage: "",
+            });
+            setTimeout(() => {
+              setAlert({
+                errStatus: false,
+                successStatus: false,
+                errMessage: "",
+                successMessage: "",
+              });
+            }, 2000);
+          }
+        }
+      });
+  }
+
+
+  const handleDeleteReview = (id) => {
+    try {
+      DeleteData({ url: `reviews/${id}`, token: token }).then((res) => {
+        if (res?.data?.status == "success") {
+          setAlert({
+            errStatus: false,
+            successStatus: true,
+            errMessage: "",
+            successMessage: res?.data?.msg,
+          })
+
+          setTimeout(() => {
+            setAlert({
+              errStatus: false,
+              successStatus: false,
+              errMessage: "",
+              successMessage: "",
+            });
+          }, 2000);
+        }
+        else {
+          setAlert({
+            errStatus: true,
+            successStatus: false,
+            errMessage: res?.data?.msg,
+            successMessage: false
+          })
+          setTimeout(() => {
+            setAlert({
+              errStatus: false,
+              successStatus: false,
+              errMessage: "",
+              successMessage: "",
+            });
+          }, 2000);
+        }
+      })
+    } catch (error) {
+      setAlert({
+        errStatus: true,
+        successStatus: false,
+        errMessage: error?.message,
+        successMessage: false
+      })
+      setTimeout(() => {
+        setAlert({
+          errStatus: false,
+          successStatus: false,
+          errMessage: "",
+          successMessage: "",
+        });
+      }, 2000);
+    }
+  }
+
+  const reviewCol = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Rate",
+      dataIndex: "rate",
+      key: "rate",
+    },
+    {
+      title: "Comment",
+      dataIndex: "comment",
+      key: "comment",
+    },
+    {
+      title: "Like",
+      dataIndex: "like",
+      key: "like",
+    },
+    {
+      title: "Action",
+      dataIndex: "_id",
+      key: "_id",
+      render: (_, elem) => (
+        <div className="d-flex justify-content-center">
+          <button className="btn btn-primary"
+            onClick={() => handleDeleteReview(elem._id)}
+          >
+            Delete
+          </button>
+        </div>
+      )
+    },
+
+  ]
+
+  const items = [
+    {
+      key: '1',
+      label: 'Customer Reviews',
+      children: (
+        <>
+          <Table columns={reviewCol} dataSource={reviewDat} />
+        </>
+      )
+    },
+  ]
+
 
   return (
     <React.Fragment>
@@ -431,14 +751,19 @@ const EditVendorProduct = () => {
                     >
                       Image
                     </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-control"
-                      name="image"
-                      id="form-productImage/thumbnail"
-                      onChange={fileUpload}
-                    />
+                    <div style={{ display: 'flex', gap: '5px' }}>
+
+                      <img src={`${details?.img}`} alt="no img" style={{ height: 50, width: 50 }} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-control"
+                        name="image"
+                        id="form-productImage/thumbnail"
+                        onChange={multiFileUpload}
+                      // value={details?.img}
+                      />
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label htmlFor="form-product/name" className="form-label">
@@ -571,6 +896,38 @@ const EditVendorProduct = () => {
                       required
                     />
                   </div>
+                  <div className="col-md-6" >
+                    <label htmlFor="form-product/rating" className="form-label">
+                      Rating
+                    </label>
+                    <input
+                      type="number"
+                      name="rating"
+                      className="form-control"
+                      id="form-product/rating"
+                      value={rating.rating}
+                    // onChange={handleDetails}
+                    // onClick={() => handleOpenRating(details?.id)}
+                    // required
+                    />
+                  </div>
+                  <div className="col-md-6" >
+                    <label htmlFor="form-product/adminrating" className="form-label">
+                      Admin Rating
+                    </label>
+                    <input
+                      type="number"
+                      name="adminRating"
+                      className="form-control"
+                      id="form-product/adminRating"
+                      value={rating.adminRating}
+                      onChange={handleDetails2}
+                      onClick={() => handleOpenRating()}
+                    />
+                  </div>
+                  <div className="col-md-12" >
+                    <Collapse items={items} />
+                  </div>
                   <div className="col-md-12">
                     <label htmlFor="form-product/price" className="form-label">
                       Descrption
@@ -591,6 +948,9 @@ const EditVendorProduct = () => {
             </div>
           </div>
         </div>
+
+
+
         {/* SUBMIT PRODUCT DETAILS */}
         {/* <div className="container-fluid pb-5 row">
           <div className="col-md-12">
@@ -608,6 +968,59 @@ const EditVendorProduct = () => {
           </div>
         </div> */}
       </form>
+
+      {rejectionStatus && (
+        <div className="password-popup">
+          <div className="rts-newsletter-popup popup">
+            <div
+              className="newsletter-close-btn"
+              onClick={() => setRejectionStatus(!rejectionStatus)}
+            >
+              <i className="fa fa-times"></i>
+            </div>
+            <div className="newsletter-inner popup-inner">
+              <h3 className="newsletter-heading">Change Rating</h3>
+              <form onSubmit={editRating} >
+                <div className="input-area">
+                  <div className="input-div">
+                    <input
+                      name="adminRating"
+                      type="number"
+                      placeholder=" Add Rating"
+                      value={rating.adminRating}
+                      onChange={(e) => setRating({
+                        ...rating,
+                        adminRating: e.target.value
+                      })}
+                    />
+                  </div>
+                  {/* <div className="input-div">
+                    <textarea
+                      name="comment"
+                      rows={5}
+                      // value={productDetails.answer}
+                      value={rating.comment}
+
+                      placeholder="comment"
+                      onChange={(e) =>
+                        setRating({ ...rating, comment: e.target.value })
+                      }
+                      required
+                    ></textarea>
+                  </div> */}
+                  <button type="submit" className="subscribe-btn">
+                    Change Rating{" "}
+                    <i
+                      className="fa fa-long-arrow-right ml--5"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 };

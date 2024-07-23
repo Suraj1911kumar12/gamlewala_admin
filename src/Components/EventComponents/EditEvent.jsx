@@ -2,13 +2,14 @@ import { Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
 import { EditData } from "../../Apis/Setters/EditData";
 import { AddData } from "../../Apis/Setters/AddData";
 
 const EditEvent = () => {
+  const navigate = useNavigate()
   const params = useParams();
   // SESSION CUSTOM HOOK
   const [setSession, getSession] = useSession();
@@ -34,6 +35,7 @@ const EditEvent = () => {
     name: "",
     group: [],
     description: "",
+    img: ''
   });
 
   let token = getSession("authorization");
@@ -46,6 +48,7 @@ const EditEvent = () => {
             id: params?.id,
             name: res?.data?.data?.name,
             description: res?.data?.data?.description,
+            img: res?.data?.data?.image.url[0],
             group: res?.data?.data?.group?.map((cat) => {
               return cat?._id
             }),
@@ -71,9 +74,9 @@ const EditEvent = () => {
 
   // MAPPING CATEGORIES OPTION FOR SELECT
   const categoriesList = categoriesListData?.map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   // METHOD TO SET DETAILS IN details STATE VARIABLE
   const handleDetails = (e) => {
@@ -120,6 +123,7 @@ const EditEvent = () => {
               errMessage: err?.response?.data?.msg,
               successMessage: "",
             });
+            navigate('/events')
             setTimeout(() => {
               setAlert({
                 errStatus: false,
@@ -284,14 +288,17 @@ const EditEvent = () => {
                     >
                       Image
                     </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-control"
-                      name="image"
-                      id="form-productImage/thumbnail"
-                      onChange={fileUpload}
-                    />
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                      <img src={details?.img} alt="" height={50} width={50} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-control"
+                        name="image"
+                        id="form-productImage/thumbnail"
+                        onChange={fileUpload}
+                      />
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label htmlFor="form-product/name" className="form-label">

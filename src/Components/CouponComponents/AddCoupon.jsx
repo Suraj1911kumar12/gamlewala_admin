@@ -46,76 +46,89 @@ const AddCoupon = () => {
 
   // HANDLING API CALL METHOD
   const coupon = async (e) => {
-    e.preventDefault();   
+    e.preventDefault();
     let credentials = { ...details };
-    AddData({ url: "coupon/create", cred: credentials, token: token })
-      .then((res) => {
-        window.scrollTo(0, 0);
-        setDetails({
-          code: "",
-          type: "",
-          discount: "",
-          discountUpTo: "",
-          totalLimit: "",
-          userLimit: "",
-          expiredAt: "",
-        });
-        setAlert({
-          successStatus: true,
-          errStatus: false,
-          successMessage: res?.data?.msg,
-          errMessage: "",
-        });
-        setTimeout(() => {
-          setAlert({
-            errStatus: false,
-            successStatus: false,
-            errMessage: "",
-            successMessage: "",
-          });
-        }, 1000);
+    if (details.code.length < 6) {
+      window.scrollTo(0, 0);
+      setAlert({
+        errStatus: true,
+        successStatus: false,
+        errMessage: "Code must be at least 6 characters",
+        successMessage: "",
       })
-      .catch((err) => {
-        if (err?.response?.status == "401") {
-          deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
-        } else {
+    }
+    else {
+
+      AddData({ url: "coupon/create", cred: credentials, token: token })
+        .then((res) => {
           window.scrollTo(0, 0);
-          if (err?.response?.data?.msg) {
-            console.log(err?.response?.data?.msg);
+          setDetails({
+            code: "",
+            type: "",
+            discount: "",
+            discountUpTo: "",
+            totalLimit: "",
+            userLimit: "",
+            expiredAt: "",
+          });
+          setAlert({
+            successStatus: true,
+            errStatus: false,
+            successMessage: res?.data?.msg,
+            errMessage: "",
+          });
+          setTimeout(() => {
             setAlert({
-              errStatus: true,
+              errStatus: false,
               successStatus: false,
-              errMessage: err?.response?.data?.msg,
+              errMessage: "",
               successMessage: "",
             });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
+          }, 1000);
+        })
+        .catch((err) => {
+          if (err?.response?.status == "401") {
+            deleteSession("authorization");
+            window.location.href = `${process.env.REACT_APP_BASE_URL}`
           } else {
-            console.log(err?.message);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.message,
-              successMessage: "",
-            });
-            setTimeout(() => {
+            window.scrollTo(0, 0);
+            if (err?.response?.data?.msg) {
+              console.log(err?.response?.data?.msg);
               setAlert({
-                errStatus: false,
+                errStatus: true,
                 successStatus: false,
-                errMessage: "",
+                errMessage: err?.response?.data?.msg,
                 successMessage: "",
               });
-            }, 2000);
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            } else {
+              console.log(err?.message);
+              setAlert({
+                errStatus: true,
+                successStatus: false,
+                errMessage: err?.message,
+                successMessage: "",
+              });
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            }
           }
-        }
-      });
+        });
+    }
+
   };
 
   return (

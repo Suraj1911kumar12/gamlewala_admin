@@ -1,19 +1,22 @@
 import { Select } from "antd";
-import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import FileUpload from "../../Apis/Setters/FileUpload";
-import { useParams, useNavigate } from "react-router";
 import useSession, { deleteSession } from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
-import { EditData } from "../../Apis/Setters/EditData";
 import { AddData } from "../../Apis/Setters/AddData";
+import { useNavigate, useParams } from "react-router-dom";
+import { UpdateData } from "../../Apis/update/UpdateAPI";
+// import axios from "axios";
 
-const EditPoojaItem = () => {
-    const imageRef = useRef()
+const EditCategoryDiscount = () => {
     const navigate = useNavigate()
-    const params = useParams();
-    // SESSION CUSTOM HOOK
-    const [setSession, getSession] = useSession();
+    const param = useParams()
+
+
+    const [discountValue, setDiscountValue] = useState("")
+    const [categoryId, setCategoryId] = useState([])
+    const [segmentId, setSegmentId] = useState([])
+
+
 
     // ALERT STATUS & MESSAGE STATE
     const [alert, setAlert] = useState({
@@ -23,116 +26,108 @@ const EditPoojaItem = () => {
         successMessage: "",
     });
 
-    let [details, setDetails] = useState({
-        id: params?.id,
-        img: '',
-        name: "",
-        description: "",
+    // CATEGORY LIST DATA
+
+    // SUB CATEGORY LIST DATA
+
+    // SEGMENT LIST DATA
+    const [segmentListData, setSegmentListData] = useState([]);
+
+    // SESSION CUSTOM HOOK
+    const [setSession, getSession] = useSession();
+
+    // VALUES STATE
+    const [details, setDetails] = useState({
+        segment: "",
+        category: "",
     });
 
     let token = getSession("authorization");
 
     useEffect(() => {
-        GetData({ url: `pooja-element/${params.id}`, token: token })
+        GetData({ url: `segment-discount/${param.id}`, token: token })
             .then((res) => {
-                if (res?.data?.status) {
-                    setDetails({
-                        id: params?.id,
-                        img: res?.data?.data?.image?.url[0],
-                        name: res?.data?.data?.name,
-                        description: res?.data?.data?.description,
-                        isActive: "true",
-                    });
-                }
+                setSegmentId(res?.data?.data?.segmentId?._id);
+                setDiscountValue(res?.data?.data?.discountValue)
             })
             .catch((error) => {
                 console.log(error);
             });
-    }, []);
+    }, [alert]);
 
-    console.log(details);
-
-
-    // METHOD TO SET DETAILS IN details STATE VARIABLE
-    const handleDetails = (e) => {
-        const { name, value } = e.target;
-        setDetails({
-            ...details,
-            [name]: value,
-        })
-    };
-
-    // FILE UPLOAD METHOD(API CALL)
-    const fileUpload = async (e) => {
-        // Getting details field to set image id
-        FileUpload({ image: e.target.files[0] })
+    useEffect(() => {
+        const credentials = { segment: details.segment, category: details.category }
+        GetData({ url: "segment", token: token })
             .then((res) => {
-                if (res?.data?.status) {
-                    setDetails({
-                        ...details,
-                        file: res?.data?.data,
-                    });
-                }
+                setSegmentListData(res.data.data);
             })
-            .catch((err) => {
-                if (err?.response?.status == "401") {
-                    deleteSession("authorization");
-                    window.location.href = `${process.env.REACT_APP_BASE_URL}`
-                } else {
-                    window.scrollTo(0, 0);
-                    if (err?.response?.data?.msg) {
-                        console.log(err?.response?.data?.msg);
-                        setAlert({
-                            errStatus: true,
-                            successStatus: false,
-                            errMessage: err?.response?.data?.msg,
-                            successMessage: "",
-                        });
-                        setTimeout(() => {
-                            setAlert({
-                                errStatus: false,
-                                successStatus: false,
-                                errMessage: "",
-                                successMessage: "",
-                            });
-                        }, 2000);
-                    } else {
-                        console.log(err?.message);
-                        setAlert({
-                            errStatus: true,
-                            successStatus: false,
-                            errMessage: err?.message,
-                            successMessage: "",
-                        });
-                        setTimeout(() => {
-                            setAlert({
-                                errStatus: false,
-                                successStatus: false,
-                                errMessage: "",
-                                successMessage: "",
-                            });
-                        }, 2000);
-                    }
-                }
+            .catch((error) => {
+                console.log(error);
             });
-    };
+    }, [details.segment])
+
+    // useEffect(() => {
+    //     const credentials = { segment: details.segment, category: details.category }
+    //     AddData({ url: "sub-category/list", cred: credentials, token: token })
+    //         .then((res) => {
+    //             setSubCategories(res.data.data);
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //         });
+    // }, [details.segment, details.category])
+
+    //MAPPING CATEGORIES OPTION FOR SELECT
+
+
+    //MAPPING CATEGORIES OPTION FOR SELECT
+
+
+    // MAPPING SEGMENT OPTION FOR SELECT
+    const segmentList = segmentListData.map((elem) => ({
+        label: elem?.name,
+        value: elem?._id,
+    }));
+    // const categoryList = categoriesListData.map((elem) => ({
+    //     label: elem?.name,
+    //     value: elem?._id,
+    // }));
+
+
+
+
+
+
+
+
+
+
+
 
 
     // HANDLING API CALL METHOD
-    const update = async (e) => {
+    const product = async (e) => {
         e.preventDefault();
+
         let token = getSession("authorization");
-        let credentials = { ...details };
-        EditData({ url: "pooja-element/edit", cred: credentials, token: token })
+
+        let credentials = {
+            "id": param.id,
+            "segmentId": segmentId,
+            "discountValue": discountValue
+        };
+        console.log("credentials", credentials);
+        UpdateData({ url: "segment-discount/update", cred: credentials, token: token })
             .then((res) => {
+                console.log(res)
                 window.scrollTo(0, 0);
+
                 setAlert({
                     successStatus: true,
                     errStatus: false,
                     successMessage: res?.data?.msg,
                     errMessage: "",
                 });
-                navigate('/pooja-items')
                 setTimeout(() => {
                     setAlert({
                         errStatus: false,
@@ -141,8 +136,10 @@ const EditPoojaItem = () => {
                         successMessage: "",
                     });
                 }, 1000);
+                navigate('/commondiscount')
             })
             .catch((err) => {
+                console.log(err);
                 if (err?.response?.status == "401") {
                     deleteSession("authorization");
                     window.location.href = `${process.env.REACT_APP_BASE_URL}`
@@ -187,7 +184,7 @@ const EditPoojaItem = () => {
 
     return (
         <React.Fragment>
-            <form onSubmit={update}>
+            <form onSubmit={product}>
                 {/* INPUT PRODUCT DETAILS */}
                 <div className="container-fluid row">
                     {/* DISPLAY ERROR MESSAGE */}
@@ -246,88 +243,79 @@ const EditPoojaItem = () => {
                                     <h4 className="mb-0 fs-exact-18">Basic information</h4>
                                 </div>
                                 <div className="row g-4 mb-4">
-                                    <div className="mb-1 col-md-6">
+
+
+                                    {/* <div className="col-md-6">
                                         <label
                                             htmlFor="form-productImage/thumbnail"
                                             className="form-label"
                                         >
-                                            Image
+                                            Segment
                                         </label>
-                                        <div style={{ display: 'flex', gap: '5px' }}>
-                                            <img src={details.img || '--'} style={{ height: 50, width: 50 }} alt="no img" />
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="form-control"
-                                                name="image"
-                                                id="form-productImage/thumbnail"
-                                                onChange={fileUpload}
-                                                ref={imageRef}
-                                            />
-                                        </div>
-                                    </div>
+                                        <Select
+                                            // mode="multiple"
+                                            allowClear
+                                            style={{ width: "100%" }}
+                                            placeholder="Select Segment"
+                                            onChange={(e) => setCategoryId(e)}
+                                            options={segmentList}
+                                            className="p-0 mb-4"
+                                            value={categoryId}
+                                        // mode="tags"
+                                        />
+                                    </div> */}
                                     <div className="col-md-6">
-                                        <label htmlFor="form-product/name" className="form-label">
-                                            Item Name
+                                        <label
+                                            htmlFor="form-productImage/thumbnail"
+                                            className="form-label"
+                                        >
+                                            Segment
+                                        </label>
+                                        <Select
+                                            // mode="multiple"
+                                            allowClear
+                                            style={{ width: "100%" }}
+                                            placeholder="Select Segment"
+                                            onChange={(e) => setSegmentId(e)}
+                                            options={segmentList}
+                                            className="p-0 mb-4"
+                                            value={segmentId}
+                                        // mode="tags"
+                                        />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label
+                                            htmlFor="form-productImage/thumbnail"
+                                            className="form-label"
+                                        >
+                                            Discount Value
                                         </label>
                                         <input
-                                            type="text"
-                                            name="name"
+                                            type="number"
+                                            name="discountValue"
                                             className="form-control"
-                                            id="form-product/name"
-                                            value={details.name}
-                                            onChange={handleDetails}
+                                            id="form-product/discountValue"
+                                            value={discountValue}
+                                            onChange={(e) => setDiscountValue(e.target.value)}
                                             required
                                         />
                                     </div>
-                                    <div className="mb-4">
-                                        <label
-                                            htmlFor="form-product/description"
-                                            className="form-label"
-                                        >
-                                            Description
-                                        </label>
-                                        <textarea
-                                            id="form-product/description"
-                                            name="description"
-                                            className="sa-quill-control form-control sa-quill-control--ready"
-                                            rows="4"
-                                            value={details.description}
-                                            onChange={handleDetails}
-                                            required
-                                        ></textarea>
-                                    </div>
                                 </div>
-                                <div className="text-center mt-5">
+                                <div className="text-center">
                                     <input
                                         type="submit"
                                         className="btn btn-outline-primary btn-sm mb-0 px-5"
-                                        value="Update Product"
+                                        value="Add Category Discount"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* SUBMIT PRODUCT DETAILS */}
-                {/* <div className="container-fluid pb-5 row">
-          <div className="col-md-12">
-            <div className="card">
-              <div className="card-body p-md-5">
-                <div className="text-center">
-                  <input
-                    type="submit"
-                    className="btn btn-outline-primary btn-sm mb-0 px-5"
-                    value="Update Product"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
             </form>
         </React.Fragment>
     );
 };
 
-export default EditPoojaItem;
+export default EditCategoryDiscount;

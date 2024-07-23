@@ -1,13 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/img/gamla/logo-gw-wbg.png"
+import logo from "../assets/img/gamla/logo-gw-wbg.png";
 
 const Sidebar = () => {
   // NAVBAR TOGGLING STATE
   const [navToggler, setNavToggler] = useState();
   // SIDEBAR MENUS STATE
-  const [menus, setMenus] = useState(false);
 
   useEffect(() => {
     setNavToggler({
@@ -44,11 +43,7 @@ const Sidebar = () => {
           ></i>
           <Link className="navbar-brand m-0 text-center" to="/dashboard">
             <div className="w-100">
-              <img
-                src={logo}
-                className="w-50 object-fit-cover"
-                alt="logo"
-              />
+              <img src={logo} className="w-50 object-fit-cover" alt="logo" />
             </div>
             <br></br>
             <h5 className="font-weight-bold text-white text-center">
@@ -95,17 +90,16 @@ const Sidebar = () => {
                       role="button"
                       aria-expanded="false"
                     >
-                      <span className="nav-link-text">Vendors (Not Verified)</span>
+                      <span className="nav-link-text">
+                        Vendors (Not Verified)
+                      </span>
                     </a>
                     <div className="collapse" id="notverifieduser">
                       <ul className="nav ms-4 ps-3">
                         <li className="nav-item ">
                           <Link className="nav-link  " to="/notverifieduser">
                             <span className="sidenav-mini-icon"> UL </span>
-                            <span className="sidenav-normal">
-                              {" "}
-                              List{" "}
-                            </span>
+                            <span className="sidenav-normal"> List </span>
                           </Link>
                         </li>
                       </ul>
@@ -127,9 +121,7 @@ const Sidebar = () => {
                         <li className="nav-item ">
                           <Link className="nav-link  " to="/orders">
                             <span className="sidenav-mini-icon"> UL </span>
-                            <span className="sidenav-normal">
-                              Orders List
-                            </span>
+                            <span className="sidenav-normal">Orders List</span>
                           </Link>
                         </li>
                       </ul>
@@ -162,19 +154,17 @@ const Sidebar = () => {
                             <span className="sidenav-mini-icon"> AL </span>
                             <span className="sidenav-normal">
                               {" "}
-                              Assistants List{" "}
+                              Veritical Head List{" "}
                             </span>
                           </Link>
                         </li>
                         <li className="nav-item ">
-                          <Link
-                            className="nav-link  "
-                            to="/users/user"
-                          >
+                          <Link className="nav-link  " to="/users/user">
                             <span className="sidenav-mini-icon"> AU </span>
                             <span className="sidenav-normal">
                               {" "}
-                              Add Assitant/Vendor{" "}
+                              Add Verical Head <br />
+                              /Vendor{" "}
                             </span>
                           </Link>
                         </li>
@@ -204,10 +194,7 @@ const Sidebar = () => {
                           </Link>
                         </li>
                         <li className="nav-item ">
-                          <Link
-                            className="nav-link  "
-                            to="/customers/customer"
-                          >
+                          <Link className="nav-link  " to="/customers/customer">
                             <span className="sidenav-mini-icon"> AC </span>
                             <span className="sidenav-normal">
                               {" "}
@@ -241,10 +228,7 @@ const Sidebar = () => {
                           </Link>
                         </li>
                         <li className="nav-item ">
-                          <Link
-                            className="nav-link  "
-                            to="/segments/segment"
-                          >
+                          <Link className="nav-link  " to="/segments/segment">
                             <span className="sidenav-mini-icon"> AU </span>
                             <span className="sidenav-normal">
                               {" "}
@@ -278,10 +262,7 @@ const Sidebar = () => {
                           </Link>
                         </li>
                         <li className="nav-item ">
-                          <Link
-                            className="nav-link"
-                            to="/categories/category"
-                          >
+                          <Link className="nav-link" to="/categories/category">
                             <span className="sidenav-mini-icon"> AC </span>
                             <span className="sidenav-normal">
                               {" "}
@@ -353,26 +334,25 @@ const Sidebar = () => {
                           </Link>
                         </li>
                         <li className="nav-item ">
-                          <Link
-                            className="nav-link"
-                            to="/filters/filter"
-                          >
+                          <Link className="nav-link" to="/filters/filter">
                             <span className="sidenav-mini-icon"> AF </span>
-                            <span className="sidenav-normal">
-                              {" "}
-                              Add Filter{" "}
-                            </span>
+                            <span className="sidenav-normal"> Add Filter </span>
                           </Link>
                         </li>
                       </ul>
                     </div>
                   </li>
 
-
                   <li className="nav-item ">
                     <Link className="nav-link" to="/sorting">
                       <span className="sidenav-mini-icon"> ST </span>
                       <span className="sidenav-normal"> Sorting </span>
+                    </Link>
+                  </li>
+                  <li className="nav-item ">
+                    <Link className="nav-link" to="/contactus">
+                      <span className="sidenav-mini-icon"> ST </span>
+                      <span className="sidenav-normal"> Contact List </span>
                     </Link>
                   </li>
 
@@ -583,6 +563,111 @@ const Sidebar = () => {
                       className="nav-link collapsed"
                       data-bs-toggle="collapse"
                       aria-expanded="false"
+                      href="#premiumevent"
+                    >
+                      <span className="sidenav-mini-icon"> P </span>
+                      <span className="nav-link-text ms-1">Premium Event</span>
+                    </a>
+                    <div className="collapse" id="premiumevent">
+                      <ul className="nav ms-4 ps-3">
+                        <li className="nav-item ">
+                          <Link className="nav-link  " to="/premiumevent">
+                            <span className="sidenav-mini-icon"> PL </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Premium Event List{" "}
+                            </span>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link className="nav-link " to="/premiumevent/create">
+                            <span className="sidenav-mini-icon text-xs">
+                              {" "}
+                              N{" "}
+                            </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Add Premium Event{" "}
+                            </span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+
+                  <li className="nav-item ">
+                    <a
+                      className="nav-link collapsed"
+                      data-bs-toggle="collapse"
+                      aria-expanded="false"
+                      href="#gift"
+                    >
+                      <span className="sidenav-mini-icon"> P </span>
+                      <span className="nav-link-text ms-1">Gift's</span>
+                    </a>
+                    <div className="collapse" id="gift">
+                      <ul className="nav ms-4 ps-3">
+                        <li className="nav-item ">
+                          <Link className="nav-link  " to="/gifts">
+                            <span className="sidenav-mini-icon"> PL </span>
+                            <span className="sidenav-normal"> Gift List </span>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link className="nav-link " to="/gift/create">
+                            <span className="sidenav-mini-icon text-xs">
+                              {" "}
+                              N{" "}
+                            </span>
+                            <span className="sidenav-normal"> Add gift </span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+
+                  <li className="nav-item ">
+                    <a
+                      className="nav-link collapsed"
+                      data-bs-toggle="collapse"
+                      aria-expanded="false"
+                      href="#occassions"
+                    >
+                      <span className="sidenav-mini-icon"> P </span>
+                      <span className="nav-link-text ms-1">occassions's</span>
+                    </a>
+                    <div className="collapse" id="occassions">
+                      <ul className="nav ms-4 ps-3">
+                        <li className="nav-item ">
+                          <Link className="nav-link  " to="/occassions">
+                            <span className="sidenav-mini-icon"> PL </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              occassions List{" "}
+                            </span>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link className="nav-link " to="/occassions/create">
+                            <span className="sidenav-mini-icon text-xs">
+                              {" "}
+                              N{" "}
+                            </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Add occassions{" "}
+                            </span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+
+                  <li className="nav-item ">
+                    <a
+                      className="nav-link collapsed"
+                      data-bs-toggle="collapse"
+                      aria-expanded="false"
                       href="#poojaitems"
                     >
                       <span className="sidenav-mini-icon"> P </span>
@@ -600,7 +685,10 @@ const Sidebar = () => {
                           </Link>
                         </li>
                         <li className="nav-item">
-                          <Link className="nav-link " to="/pooja-items/pooja-item">
+                          <Link
+                            className="nav-link "
+                            to="/pooja-items/pooja-item"
+                          >
                             <span className="sidenav-mini-icon text-xs">
                               {" "}
                               AP{" "}
@@ -691,9 +779,7 @@ const Sidebar = () => {
                       aria-expanded="false"
                       href="#banners"
                     >
-                      <span className="nav-link-text ms-1">
-                        Banner
-                      </span>
+                      <span className="nav-link-text ms-1">Banner</span>
                     </a>
                     <div className="collapse" id="banners">
                       <ul className="nav ms-4 ps-3">
@@ -723,11 +809,49 @@ const Sidebar = () => {
                       className="nav-link collapsed"
                       data-bs-toggle="collapse"
                       aria-expanded="false"
-                      href="#coupons"
+                      href="#common_discount"
                     >
                       <span className="nav-link-text ms-1">
-                        Coupons
+                        Common Discount
                       </span>
+                    </a>
+                    <div className="collapse" id="common_discount">
+                      <ul className="nav ms-4 ps-3">
+                        <li className="nav-item ">
+                          <Link className="nav-link  " to="/commondiscount">
+                            <span className="sidenav-mini-icon"> BL </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Common Discount List{" "}
+                            </span>
+                          </Link>
+                        </li>
+                        <li className="nav-item">
+                          <Link
+                            className="nav-link "
+                            to="/commondiscount/create"
+                          >
+                            <span className="sidenav-mini-icon text-xs">
+                              {" "}
+                              AB{" "}
+                            </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Add Common Discount{" "}
+                            </span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li className="nav-item ">
+                    <a
+                      className="nav-link collapsed"
+                      data-bs-toggle="collapse"
+                      aria-expanded="false"
+                      href="#coupons"
+                    >
+                      <span className="nav-link-text ms-1">Coupons</span>
                     </a>
                     <div className="collapse" id="coupons">
                       <ul className="nav ms-4 ps-3">
@@ -759,9 +883,7 @@ const Sidebar = () => {
                       aria-expanded="false"
                       href="#events"
                     >
-                      <span className="nav-link-text ms-1">
-                        Events
-                      </span>
+                      <span className="nav-link-text ms-1">Events</span>
                     </a>
                     <div className="collapse" id="events">
                       <ul className="nav ms-4 ps-3">
@@ -780,10 +902,7 @@ const Sidebar = () => {
                               {" "}
                               AE{" "}
                             </span>
-                            <span className="sidenav-normal">
-                              {" "}
-                              Add Event{" "}
-                            </span>
+                            <span className="sidenav-normal"> Add Event </span>
                           </Link>
                         </li>
                       </ul>
@@ -796,9 +915,7 @@ const Sidebar = () => {
                       aria-expanded="false"
                       href="#festivals"
                     >
-                      <span className="nav-link-text ms-1">
-                        Festivals
-                      </span>
+                      <span className="nav-link-text ms-1">Festivals</span>
                     </a>
                     <div className="collapse" id="festivals">
                       <ul className="nav ms-4 ps-3">
@@ -831,21 +948,41 @@ const Sidebar = () => {
                       className="nav-link collapsed"
                       data-bs-toggle="collapse"
                       aria-expanded="false"
-                      href="#pages"
+                      href="#requestcallbacks"
                     >
                       <span className="nav-link-text ms-1">
-                        Static Pages
+                        Request Callbacks
                       </span>
+                    </a>
+                    <div className="collapse" id="requestcallbacks">
+                      <ul className="nav ms-4 ps-3">
+                        <li className="nav-item ">
+                          <Link className="nav-link  " to="/requestcallbacks">
+                            <span className="sidenav-mini-icon"> FL </span>
+                            <span className="sidenav-normal">
+                              {" "}
+                              Request Callbacks List{" "}
+                            </span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li className="nav-item ">
+                    <a
+                      className="nav-link collapsed"
+                      data-bs-toggle="collapse"
+                      aria-expanded="false"
+                      href="#pages"
+                    >
+                      <span className="nav-link-text ms-1">Static Pages</span>
                     </a>
                     <div className="collapse" id="pages">
                       <ul className="nav ms-4 ps-3">
                         <li className="nav-item ">
                           <Link className="nav-link  " to="/pages">
                             <span className="sidenav-mini-icon"> PL </span>
-                            <span className="sidenav-normal">
-                              {" "}
-                              Pages List{" "}
-                            </span>
+                            <span className="sidenav-normal"> Pages List </span>
                           </Link>
                         </li>
                         <li className="nav-item">
@@ -854,10 +991,7 @@ const Sidebar = () => {
                               {" "}
                               AP{" "}
                             </span>
-                            <span className="sidenav-normal">
-                              {" "}
-                              Add Page{" "}
-                            </span>
+                            <span className="sidenav-normal"> Add Page </span>
                           </Link>
                         </li>
                       </ul>

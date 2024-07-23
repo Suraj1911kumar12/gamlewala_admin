@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const FileUpload = async (props) => {
+  console.log(props);
   try {
     function getSession(cname) {
       return window.sessionStorage.getItem(cname);
     }
-
     let file = {
       image: props.image,
       // type: props.type,
@@ -33,7 +33,7 @@ const FileUpload = async (props) => {
   }
 };
 
-export default FileUpload;   
+export default FileUpload;
 
 
 // import axios from "axios";

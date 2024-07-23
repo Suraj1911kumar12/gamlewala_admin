@@ -31,7 +31,7 @@ const PackageList = () => {
   let token = getSession("authorization");
 
   useEffect(() => {
-     GetData({ url: "pooja-package", token: token })
+    GetData({ url: "pooja-package", token: token })
       .then((res) => {
         setEventListData(res.data.data);
       })
@@ -51,9 +51,9 @@ const PackageList = () => {
       dataIndex: "image",
       render: (_, elem) => (
         // <Link href="app-product.html" className="me-4">
-          <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
-            <img src={elem.image} width="40" height="40" alt="" />
-          </div>
+        <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
+          <img src={elem.image} width="40" height="40" alt="" />
+        </div>
         // </Link>
       ),
     },
@@ -76,7 +76,7 @@ const PackageList = () => {
       ...columnSearchProps("price"),
     },
     {
-      title: "POOJA ITEMS",
+      title: "ITEMS",
       key: "elements",
       dataIndex: ["elements", "name"],
       ...columnSearchProps("elements"),
@@ -97,12 +97,16 @@ const PackageList = () => {
     {
       title: "STATUS",
       key: "isActive",
-      dataIndex: "isActive",           
+      dataIndex: "isActive",
       render: (_, elem) => (
         <div className=" text-left px-2 py-1">
           <div className=" text-left">
-            <div className="badge bg-primary">
-              {elem.isActive ? "Active" : "Not Active"}
+            <div
+              className={
+                elem?.isActive ? "badge bg-success" : "badge bg-danger"
+              }
+            >
+              {elem?.isActive ? "Active" : "Inactive"}
             </div>
           </div>
         </div>
@@ -186,7 +190,7 @@ const PackageList = () => {
       .catch((err) => {
         if (err?.response?.status == "401") {
           deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
+          window.location.href = `${process.env.REACT_APP_BASE_URL}`;
         } else {
           window.scrollTo(0, 0);
           if (err?.response?.data?.msg) {
@@ -289,7 +293,7 @@ const PackageList = () => {
               </div>
               <div className="card-body px-0 pb-2">
                 <div className="table-responsive">
-                  {<Datatable data={data} columns={columns}/>}
+                  {<Datatable data={data} columns={columns} />}
                 </div>
               </div>
             </div>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Datatable from "../DataTableComponent/Datatable";
-import { Tag } from "antd";
 import useColumnSearchProps from "../../hooks/useColumnSearchProps";
 import { AddData } from "../../Apis/Setters/AddData";
 import useSession, { deleteSession } from "../../hooks/session";
@@ -62,7 +61,13 @@ const ProductList = () => {
       render: (_, elem) => (
         <Link href="app-product.html" className="me-4">
           <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
-            <img src={elem?.image} width="40" height="40" alt="" />
+            {
+              elem?.image ?
+                <img src={elem?.image[0]?.url || 'abc.png'} width="40" height="40" alt="no" />
+                :
+                <img src={'abc.png'} width="40" height="40" alt="no" />
+
+            }
           </div>
         </Link>
       ),
@@ -80,19 +85,19 @@ const ProductList = () => {
       render: (_, { segment }) => (
         <>
           <div className="text-left">
-            <span>{segment.name}</span>
+            <span>{segment?.name}</span>
           </div>
         </>
       ),
     },
     {
       title: "CATEGORY",
-      dataIndex: ["category", "name"],
+      dataIndex: ['category', 'name'],
       key: "category",
       render: (_, { category }) => (
         <>
           <div className="text-left">
-            <span>{category.name}</span>
+            <span>{category?.name}</span>
           </div>
         </>
       ),
@@ -104,7 +109,7 @@ const ProductList = () => {
       render: (_, { vendor }) => (
         <>
           <div className="">
-            <span className="text-sm">{vendor.name}</span>
+            <span className="text-sm">{vendor?.name || '--'}</span>
           </div>
         </>
       ),
@@ -128,15 +133,26 @@ const ProductList = () => {
       ...columnSearchProps("mrp"),
     },
     {
+      title: "Rating",
+      key: "rating",
+      dataIndex: "rating",
+      render: (_, elem) => (
+        // <Tooltip title={elem?.rating} placement="top">
+        //   <Rate tooltips={elem?.rating} value={elem?.rating} allowHalf disabled style={{ fontSize: 20 }} />
+        // </Tooltip>
+        <span className="badge  bg-gradient-secondary">{elem?.rating}</span>
+      ),
+    },
+    {
       title: "APPROVAL",
       key: "status",
       dataIndex: "status",
       render: (_, elem) => (
         <div className=" text-left px-2 py-1">
-          <div className=" text-left">
-            <div className="badge bg-primary">
-              {elem.status}
-            </div>
+          <div className=" text-left">{elem?.status == "rejected" ?
+            <div className="badge bg-danger">{elem?.status}</div>
+            :
+            <div className="badge bg-success">{elem?.status}</div>}
           </div>
         </div>
       ),
@@ -170,30 +186,39 @@ const ProductList = () => {
                 Update
               </Link>
             </li>
-            {/* <li
-              onClick={() => {
-                setApprovalStatus(!approvalStatus);
-                setProductDetails({
-                  id: elem._id,
-                });
-              }}
-            >
-              <Link className="dropdown-item border-radius-md" to="#">
-                Approve
-              </Link>
-            </li> */}
-            {/* <li
-              onClick={() => {
-                setRejectionStatus(!rejectionStatus);
-                setProductDetails({
-                  id: elem._id,
-                });
-              }}
-            >
-              <Link className="dropdown-item border-radius-md" to="#">
-                Reject
-              </Link>
-            </li> */}
+
+            {
+              elem?.status == "approved" ? '' :
+
+                <li
+                  onClick={() => {
+                    setApprovalStatus(!approvalStatus);
+                    setProductDetails({
+                      id: elem._id,
+                    });
+                  }}
+                >
+                  <Link className="dropdown-item border-radius-md" to="#">
+                    Approve
+                  </Link>
+                </li>
+            }
+            {
+              elem?.status == "rejected" ? '' :
+                <li
+                  onClick={() => {
+                    setRejectionStatus(!rejectionStatus);
+                    setProductDetails({
+                      id: elem._id,
+                    });
+                  }}
+                >
+                  <Link className="dropdown-item border-radius-md" to="#">
+                    Reject
+                  </Link>
+                </li>
+            }
+
           </ul>
         </div>
       ),
@@ -484,7 +509,7 @@ const ProductList = () => {
       </div>
 
       {/* VERIFY OR REJECT VIEW */}
-      {/* {rejectionStatus && (
+      {rejectionStatus && (
         <div className="password-popup">
           <div className="rts-newsletter-popup popup">
             <div
@@ -512,7 +537,7 @@ const ProductList = () => {
                   <button type="submit" className="subscribe-btn">
                     Reject{" "}
                     <i
-                      class="fa fa-long-arrow-right ml--5"
+                      className="fa fa-long-arrow-right ml--5"
                       aria-hidden="true"
                     ></i>
                   </button>
@@ -521,10 +546,10 @@ const ProductList = () => {
             </div>
           </div>
         </div>
-      )} */}
+      )}
 
       {/* APPROVAL VIEW */}
-      {/* {approvalStatus && (
+      {approvalStatus && (
         <div className="password-popup">
           <div className="rts-newsletter-popup popup">
             <div
@@ -540,7 +565,7 @@ const ProductList = () => {
                   <button type="submit" className="subscribe-btn">
                     Approve{" "}
                     <i
-                      class="fa fa-long-arrow-right ml--5"
+                      className="fa fa-long-arrow-right ml--5"
                       aria-hidden="true"
                     ></i>
                   </button>
@@ -549,7 +574,7 @@ const ProductList = () => {
             </div>
           </div>
         </div>
-      )} */}
+      )}
     </React.Fragment>
   );
 };

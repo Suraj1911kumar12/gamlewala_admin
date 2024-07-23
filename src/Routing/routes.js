@@ -82,6 +82,21 @@ import AddPackage from "../Components/PoojaPackageComponents/AddPackage";
 import PackageList from "../Components/PoojaPackageComponents/PackageList";
 import AddPoojaItems from "../Components/PoojaPackageComponents/AddPoojaItems";
 import EditSorting from "../Components/SortingComponents/EditSorting";
+import PremiumEvent from "../Components/PremiumEvents/PremiumEvent";
+import AddPremiumEvent from "../Components/PremiumEvents/AddPremiumEvent";
+import EditPremiumEvent from "../Components/PremiumEvents/EditPremiumEvent";
+import CategoryDiscount from "../Components/categorydiscount/CategoryDiscount";
+import AddCategoryDiscount from "../Components/categorydiscount/AddCategoryDiscount";
+import EditCategoryDiscount from "../Components/categorydiscount/EditCategoryDiscount";
+import RequestCallbacks from "../Components/RequestCallbacks/RequestCallbackList";
+import RequestCallbackDetail from "../Components/RequestCallbacks/RequestCallbackDetail";
+import GiftList from "../Components/Gifts/GiftList";
+import EditGift from "../Components/Gifts/EditGift";
+import AddGift from "../Components/Gifts/AddGift";
+import Occassions from "../Components/occassion/occasions";
+import EditOccassions from "../Components/occassion/EditOccassions";
+import AddOccassions from "../Components/occassion/AddOccassions";
+import ContactUs from "../Components/contactUsData/ContactUs";
 
 export const routes = [
   {
@@ -386,7 +401,7 @@ export const routes = [
         noCollapse: true,
       },
     ],
-  }, 
+  },
   {
     type: "collapse",
     name: "NotvwerifiedUsers",
@@ -413,7 +428,7 @@ export const routes = [
   },
   {
     type: "collapse",
-    name: "Assistants",
+    name: "Vertical Head",
     key: "assistant",
     route: "/assistants",
     component: <AssistantList />,
@@ -731,6 +746,140 @@ export const routes = [
     component: <EditSorting />,
     noCollapse: true,
   },
+
+  {
+    type: "collapse",
+    name: "premium event",
+    key: "premium_event",
+    route: "/premiumevent",
+    component: <PremiumEvent />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "premium event",
+    key: "premium_event",
+    route: "/premiumevent/:id",
+    component: <EditPremiumEvent />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "add premium event",
+    key: "add_premium_event",
+    route: "/premiumevent/create",
+    component: <AddPremiumEvent />,
+    noCollapse: true,
+  },
+
+
+
+  {
+    type: "collapse",
+    name: "Gifts",
+    key: "gifts",
+    route: "/gifts",
+    component: <GiftList />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "edit gift",
+    key: "edit_gift",
+    route: "/gift/:id",
+    component: <EditGift />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "add gift",
+    key: "add_gift",
+    route: "/gift/create",
+    component: <AddGift />,
+    noCollapse: true,
+  },
+
+
+
+  {
+    type: "collapse",
+    name: "Occassions",
+    key: "occassions",
+    route: "/occassions",
+    component: <Occassions />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "edit occassions",
+    key: "edit_occassions",
+    route: "/occassions/:id",
+    component: <EditOccassions />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "add occassions",
+    key: "add_occassions",
+    route: "/occassions/create",
+    component: <AddOccassions />,
+    noCollapse: true,
+  },
+
+
+
+  {
+    type: "collapse",
+    name: "contactUs",
+    key: "contactUs",
+    route: "/contactUs",
+    component: <ContactUs />,
+    noCollapse: true,
+  },
+
+
+  {
+    type: "collapse",
+    name: "Add common Descount",
+    key: "add_common_discount",
+    route: "/commondiscount",
+    component: <CategoryDiscount />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "common event",
+    key: "common_event",
+    route: "/commondiscount/create",
+    component: <AddCategoryDiscount />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "add common event",
+    key: "add_common_event",
+    route: "/commondiscount/:id",
+    component: <EditCategoryDiscount />,
+    noCollapse: true,
+  },
+
+  {
+    type: "collapse",
+    name: "request callbacks",
+    key: "requst_callbacks",
+    route: "/requestcallbacks",
+    component: <RequestCallbacks />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "request callbacks detail",
+    key: "requst_callbacks detail",
+    route: "/requestcallbacks/:id",
+    component: <RequestCallbackDetail />,
+    noCollapse: true,
+  },
+
 ];
 
 export const defaultRoute = [

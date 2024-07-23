@@ -2,13 +2,14 @@ import { Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router-dom";
 import useSession, { deleteSession } from "../../hooks/session";
 import { GetData } from "../../Apis/Getters/GetData";
 import { EditData } from "../../Apis/Setters/EditData";
 import { AddData } from "../../Apis/Setters/AddData";
 
 const EditPackage = () => {
+    const navigate = useNavigate()
     const params = useParams();
     // SESSION CUSTOM HOOK
     const [setSession, getSession] = useSession();
@@ -41,21 +42,23 @@ const EditPackage = () => {
 
     let [details, setDetails] = useState({
         id: params?.id,
+        img: '',
         name: "",
         description: "",
         price: "",
         mrp: "",
-        segment: ""
+        segment: "",
+        stock: '',
     });
 
     const handleSegment = (value) => {
         setDetails((prev) => {
-          return {
-            ...prev,
-            segment: value,
-          };
+            return {
+                ...prev,
+                segment: value,
+            };
         });
-      };
+    };
 
     let token = getSession("authorization");
 
@@ -65,12 +68,14 @@ const EditPackage = () => {
                 if (res?.data?.status) {
                     setDetails({
                         id: params?.id,
+                        img: res?.data?.data?.image.url[0],
                         name: res?.data?.data?.name,
                         description: res?.data?.data?.description,
                         price: res?.data?.data?.price,
                         mrp: res?.data?.data?.mrp,
                         segment: res?.data?.data?.segment?._id,
                         isActive: "true",
+                        stock: res?.data?.data?.stock
                     });
                 }
             })
@@ -79,7 +84,7 @@ const EditPackage = () => {
             });
     }, []);
 
-    console.log(details);
+    // console.log(details);
 
 
     // METHOD TO SET DETAILS IN details STATE VARIABLE
@@ -110,7 +115,7 @@ const EditPackage = () => {
                 } else {
                     window.scrollTo(0, 0);
                     if (err?.response?.data?.msg) {
-                        console.log(err?.response?.data?.msg);
+                        // console.log(err?.response?.data?.msg);
                         setAlert({
                             errStatus: true,
                             successStatus: false,
@@ -161,6 +166,7 @@ const EditPackage = () => {
                     successMessage: res?.data?.msg,
                     errMessage: "",
                 });
+                navigate('/packages')
                 setTimeout(() => {
                     setAlert({
                         errStatus: false,
@@ -281,14 +287,17 @@ const EditPackage = () => {
                                         >
                                             Image
                                         </label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="form-control"
-                                            name="image"
-                                            id="form-productImage/thumbnail"
-                                            onChange={fileUpload}
-                                        />
+                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                            <img src={details?.img} style={{ height: 50, width: 50 }} alt="" />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="form-control"
+                                                name="image"
+                                                id="form-productImage/thumbnail"
+                                                onChange={fileUpload}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="col-md-6">
                                         <label htmlFor="form-product/name" className="form-label">
@@ -348,6 +357,20 @@ const EditPackage = () => {
                                             options={segmentList}
                                             className="p-0"
                                             value={details?.segment}
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label htmlFor="form-product/name" className="form-label">
+                                            Stock
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="stock"
+                                            className="form-control"
+                                            id="form-product/name"
+                                            value={details.stock}
+                                            onChange={handleDetails}
+                                            required
                                         />
                                     </div>
                                     <div className="mb-4">

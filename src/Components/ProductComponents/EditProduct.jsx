@@ -13,6 +13,8 @@ const EditProduct = () => {
   // SESSION CUSTOM HOOK
   const [setSession, getSession] = useSession();
 
+  const [value, setValue] = useState()
+
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -31,6 +33,7 @@ const EditProduct = () => {
 
   let [details, setDetails] = useState({
     id: params?.id,
+    img: '',
     name: "",
     price: "",
     category: "",
@@ -39,7 +42,8 @@ const EditProduct = () => {
     vendorPrice: "",
     isActive: "",
     file: "",
-    subCategory: ""
+    subCategory: "",
+    desc: ""
   });
 
   let token = getSession("authorization");
@@ -47,9 +51,12 @@ const EditProduct = () => {
   useEffect(() => {
     GetData({ url: `product/${params.id}`, token: token })
       .then((res) => {
+        // console.log(res);
         if (res?.data?.status) {
+          console.log(res?.data?.data?.image[0], 'image here');
           setDetails({
             id: params?.id,
+            img: res?.data?.data?.image[0]?.url,
             name: res?.data?.data?.name,
             price: res?.data?.data?.price,
             category: res?.data?.data?.category?._id,
@@ -58,8 +65,10 @@ const EditProduct = () => {
             vendorPrice: res?.data?.data?.vendorPrice,
             subCategory: res?.data?.data?.subCategory?._id,
             deliveryType: res?.data?.data?.deliveryType,
+            desc: res?.data?.data?.description,
             isActive: "true",
           });
+          setValue(res?.data?.data?.description)
         }
       })
       .catch((error) => {
@@ -73,6 +82,11 @@ const EditProduct = () => {
         console.log(error);
       });
   }, []);
+
+
+
+
+
 
   useEffect(() => {
     const credentials = { segment: details.segment }
@@ -237,58 +251,137 @@ const EditProduct = () => {
   };
 
   // FILE UPLOAD METHOD(API CALL)
-  const fileUpload = async (e) => {
-    // Getting details field to set image id
-    FileUpload({ image: e.target.files[0] })
-      .then((res) => {
-        if (res?.data?.status) {
-          setDetails({
-            ...details,
-            file: res?.data?.data,
-          });
-        }
-      })
-      .catch((err) => {
-        if (err?.response?.status == "401") {
-          deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
-        } else {
-          window.scrollTo(0, 0);
-          if (err?.response?.data?.msg) {
-            console.log(err?.response?.data?.msg);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.response?.data?.msg,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
-          } else {
-            console.log(err?.message);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.message,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
+  // const fileUpload = async (e) => {
+  //   // Getting details field to set image id
+  //   FileUpload({ image: e.target.files[0] })
+  //     .then((res) => {
+  //       if (res?.data?.status) {
+  //         setDetails({
+  //           ...details,
+  //           img: res?.data?.data,
+  //         });
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       if (err?.response?.status == "401") {
+  //         deleteSession("authorization");
+  //         window.location.href = `${process.env.REACT_APP_BASE_URL}`
+  //       } else {
+  //         window.scrollTo(0, 0);
+  //         if (err?.response?.data?.msg) {
+  //           console.log(err?.response?.data?.msg);
+  //           setAlert({
+  //             errStatus: true,
+  //             successStatus: false,
+  //             errMessage: err?.response?.data?.msg,
+  //             successMessage: "",
+  //           });
+  //           setTimeout(() => {
+  //             setAlert({
+  //               errStatus: false,
+  //               successStatus: false,
+  //               errMessage: "",
+  //               successMessage: "",
+  //             });
+  //           }, 2000);
+  //         } else {
+  //           console.log(err?.message);
+  //           setAlert({
+  //             errStatus: true,
+  //             successStatus: false,
+  //             errMessage: err?.message,
+  //             successMessage: "",
+  //           });
+  //           setTimeout(() => {
+  //             setAlert({
+  //               errStatus: false,
+  //               successStatus: false,
+  //               errMessage: "",
+  //               successMessage: "",
+  //             });
+  //           }, 2000);
+  //         }
+  //       }
+  //     });
+  // };
+
+  const multiFileUpload = async (e) => {
+    // Storing multiple images into array
+    let allInputImages = [...e.target.files];
+    // Fetching access token
+    let token = getSession("authorization");
+    // Declaring empty array variable
+    let img = [];
+
+    // Looping through all input images
+    allInputImages.forEach((e) => {
+      // Defining image, image path & module id
+      // console.log(e, "eeeeeeeeeeeeeeeeeee");
+      let file = {
+        images: e,
+        type: "Product",
+        module_id: 1,
+      };
+      // console.log(file?.images, "ddddddddddddddddddddddeeeeeeeeee");
+
+      // Requesting to upload a image
+      FileUpload({ image: file?.images })
+        .then((res) => {
+          console.log(res, "res herer");
+          if (res.data.status) {
+            // Pushing image id to declared array variable
+            img = [...img, res?.data?.data];
+            // Updating details state with images array
+            setDetails({
+              ...details,
+              file: img,
+            })
+            // setSingleImage([img])
           }
-        }
-      });
+        })
+        .catch((err) => {
+          console.log(err, 'errrorerpeoe');
+          if (err?.response?.status == "401") {
+            deleteSession("authorization");
+            window.location.href = `${process.env.REACT_APP_BASE_URL}`
+          } else {
+            window.scrollTo(0, 0);
+            if (err?.response?.data?.msg) {
+              console.log(err?.response?.data?.msg);
+              setAlert({
+                errStatus: true,
+                successStatus: false,
+                errMessage: err?.response?.data?.msg,
+                successMessage: "",
+              });
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            } else {
+              console.log(err?.message);
+              setAlert({
+                errStatus: true,
+                successStatus: false,
+                errMessage: err?.message,
+                successMessage: "",
+              });
+              setTimeout(() => {
+                setAlert({
+                  errStatus: false,
+                  successStatus: false,
+                  errMessage: "",
+                  successMessage: "",
+                });
+              }, 2000);
+            }
+          }
+        });
+    });
   };
 
 
@@ -358,6 +451,10 @@ const EditProduct = () => {
       });
   };
 
+  const setDescription = (content) => {
+    setValue(content)
+  }
+
   return (
     <React.Fragment>
       <form onSubmit={update}>
@@ -426,14 +523,19 @@ const EditProduct = () => {
                     >
                       Image
                     </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-control"
-                      name="image"
-                      id="form-productImage/thumbnail"
-                      onChange={fileUpload}
-                    />
+                    <div style={{ display: 'flex', gap: '5px' }}>
+
+                      <img src={`${details?.img}`} alt="no img" style={{ height: 50, width: 50 }} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-control"
+                        name="image"
+                        id="form-productImage/thumbnail"
+                        onChange={multiFileUpload}
+                      // value={`{details?.img}`}
+                      />
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label htmlFor="form-product/name" className="form-label">
@@ -558,6 +660,8 @@ const EditProduct = () => {
                     </label>
                     <SunEditor
                       setOptions={options}
+                      setContents={value}
+                      onChange={content => setDescription(content)}
                     />
                   </div>
                 </div>

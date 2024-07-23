@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
 import useSession, { deleteSession } from "../../hooks/session";
 import { AddData } from "../../Apis/Setters/AddData";
+import { useNavigate } from "react-router-dom";
 
 const AddFestival = () => {
+  const navigate = useNavigate()
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -27,33 +29,33 @@ const AddFestival = () => {
     description: ""
   });
 
-//   let token = getSession("authorization");
+  //   let token = getSession("authorization");
 
-//   useEffect(() => {
-//     const credentials = { segment: "" }
-//     AddData({ url: "category/list", cred: credentials, token: token })
-//       .then((res) => {
-//         setCategoriesListData(res.data.data);
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//       });
-//   }, [])
+  //   useEffect(() => {
+  //     const credentials = { segment: "" }
+  //     AddData({ url: "category/list", cred: credentials, token: token })
+  //       .then((res) => {
+  //         setCategoriesListData(res.data.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   }, [])
 
-//   //MAPPING CATEGORIES OPTION FOR SELECT
-//   const categoriesList = categoriesListData
-//     .map((elem) => ({
-//       label: elem?.name,
-//       value: elem?._id,
-//     }));
+  //   //MAPPING CATEGORIES OPTION FOR SELECT
+  //   const categoriesList = categoriesListData
+  //     .map((elem) => ({
+  //       label: elem?.name,
+  //       value: elem?._id,
+  //     }));
 
-//   const handleNameDetails = (e) => {
-//     const { name, value } = e.target;
-//     setDetails({
-//       ...details,
-//       [name]: value,
-//     });
-//   }
+  //   const handleNameDetails = (e) => {
+  //     const { name, value } = e.target;
+  //     setDetails({
+  //       ...details,
+  //       [name]: value,
+  //     });
+  //   }
 
   // METHOD TO SET DETAILS IN details STATE VARIABLE
   const handleDetails = (e) => {
@@ -67,14 +69,14 @@ const AddFestival = () => {
   console.log(details);
 
   // HANDLING CATEGORIES
-//   const handleCategories = (value) => {
-//     setDetails((prev) => {
-//       return {
-//         ...prev,
-//         group: value,
-//       };
-//     });
-//   };
+  //   const handleCategories = (value) => {
+  //     setDetails((prev) => {
+  //       return {
+  //         ...prev,
+  //         group: value,
+  //       };
+  //     });
+  //   };
 
   // FILE UPLOAD METHOD(API CALL)
   const fileUpload = async (e) => {
@@ -145,6 +147,7 @@ const AddFestival = () => {
           group: [],
           description: ""
         });
+        navigate('/festivals')
         setAlert({
           successStatus: true,
           errStatus: false,

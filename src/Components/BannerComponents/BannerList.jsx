@@ -27,7 +27,7 @@ const BannerList = () => {
         console.log(error);
       });
   }, [deleteData]);
-  
+
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -113,9 +113,9 @@ const BannerList = () => {
       key: "image",
       dataIndex: "image",
       render: (_, elem) => (
-        <Link href="app-product.html" className="me-4">
+        <Link href="app-product.html" className="">
           <div className="sa-symbol sa-symbol--shape--rounded sa-symbol--size--lg">
-            <img src={elem.image} width="40" height="40" alt="" />
+            <img src={elem.image} width="100" height="40" alt="" />
           </div>
         </Link>
       ),
@@ -131,7 +131,7 @@ const BannerList = () => {
       dataIndex: "type",
       key: "type",
       ...columnSearchProps("type"),
-    },   
+    },
     {
       title: "DESCRIPTION",
       key: "description",

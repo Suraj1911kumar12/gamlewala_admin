@@ -1,11 +1,12 @@
 import { Select } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FileUpload from "../../Apis/Setters/FileUpload";
 import useSession, { deleteSession } from "../../hooks/session";
 import { AddData } from "../../Apis/Setters/AddData";
 import { GetData } from "../../Apis/Getters/GetData";
 
 const AddPackage = () => {
+  const imageRef = useRef()
   // ALERT STATUS & MESSAGE STATE
   const [alert, setAlert] = useState({
     errStatus: false,
@@ -32,9 +33,9 @@ const AddPackage = () => {
 
   //MAPPING SEGMENT OPTION FOR SELECT
   const segmentList = segment?.map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   const handleSegment = (value) => {
     setDetails((prev) => {
@@ -53,7 +54,8 @@ const AddPackage = () => {
     mrp: "",
     price: "",
     segment: "",
-    isActive: true
+    isActive: true,
+    stock: ""
   });
 
   // METHOD TO SET DETAILS IN details STATE VARIABLE
@@ -132,9 +134,14 @@ const AddPackage = () => {
         setDetails({
           name: "",
           file: "",
-          group: [],
-          description: ""
+          description: "",
+          mrp: "",
+          price: "",
+          segment: "",
+          isActive: true,
+          stock: ""
         });
+        imageRef.current.value = ''
         setAlert({
           successStatus: true,
           errStatus: false,
@@ -268,6 +275,7 @@ const AddPackage = () => {
                       name="thumbnail"
                       id="form-productImage/thumbnail"
                       onChange={fileUpload}
+                      ref={imageRef}
                       required
                     />
                   </div>
@@ -346,7 +354,21 @@ const AddPackage = () => {
                       onChange={handleSegment}
                       options={segmentList}
                       className="p-0"
-                    //value={details?.category}
+                      value={details?.segment}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="form-product/name" className="form-label">
+                      Stock
+                    </label>
+                    <input
+                      type="number"
+                      name="stock"
+                      className="form-control"
+                      id="form-product/stock"
+                      value={details?.stock}
+                      onChange={handleDetails}
+                      required
                     />
                   </div>
                   <div className="mb-4">

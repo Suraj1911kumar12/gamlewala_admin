@@ -1,13 +1,15 @@
 import { Select } from "antd";
-import React, { useEffect, useState } from "react";
-import FileUpload from "../../Apis/Setters/FileUpload";
+import React, { useEffect, useRef, useState } from "react";
 import useSession, { deleteSession } from "../../hooks/session";
+import { GetData } from "../../Apis/Getters/GetData";
 import { AddData } from "../../Apis/Setters/AddData";
-import { useNavigate } from "react-router-dom";
+// import axios from "axios";
 
-const AddEvent = () => {
+const AddOccassions = () => {
+ 
+
+
   // ALERT STATUS & MESSAGE STATE
-  const navigate = useNavigate()
   const [alert, setAlert] = useState({
     errStatus: false,
     successStatus: false,
@@ -15,8 +17,8 @@ const AddEvent = () => {
     successMessage: "",
   });
 
-  // CATEGORY LIST DATA
-  const [categoriesListData, setCategoriesListData] = useState([]);
+  // SEGMENT LIST DATA
+  const [giftListType, setGiftListType] = useState([]);
 
   // SESSION CUSTOM HOOK
   const [setSession, getSession] = useSession();
@@ -24,30 +26,26 @@ const AddEvent = () => {
   // VALUES STATE
   const [details, setDetails] = useState({
     name: "",
-    file: "",
-    group: [],
-    description: ""
+    giftType: [],
   });
 
   let token = getSession("authorization");
 
   useEffect(() => {
-    const credentials = { segment: "" }
-    AddData({ url: "category/list", cred: credentials, token: token })
+    GetData({ url: "gift-type", token: token })
       .then((res) => {
-        setCategoriesListData(res.data.data);
+        setGiftListType(res.data.data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, [])
+  }, [alert]);
 
-  //MAPPING CATEGORIES OPTION FOR SELECT
-  const categoriesList = categoriesListData
-    .map((elem) => ({
-      label: elem?.name,
-      value: elem?._id,
-    }));
+  //MAPPING SEGMENT OPTION FOR SELECT
+  const giftList = giftListType.map((elem) => ({
+    label: elem?.name,
+    value: elem?._id,
+  }));
 
   const handleNameDetails = (e) => {
     const { name, value } = e.target;
@@ -55,97 +53,33 @@ const AddEvent = () => {
       ...details,
       [name]: value,
     });
-  }
-
-  // METHOD TO SET DETAILS IN details STATE VARIABLE
-  const handleDetails = (e) => {
-    const { name, value } = e.target;
-    setDetails({
-      ...details,
-      [name]: value,
-    })
   };
 
   // HANDLING CATEGORIES
-  const handleCategories = (value) => {
+  const handleSegment = (value) => {
     setDetails((prev) => {
       return {
         ...prev,
-        group: value,
+        giftType: value,
       };
     });
   };
 
-  // FILE UPLOAD METHOD(API CALL)
-  const fileUpload = async (e) => {
-    // Getting details field to set image id
-    FileUpload({ image: e.target.files[0] })
-      .then((res) => {
-        if (res?.data?.status) {
-          setDetails({
-            ...details,
-            file: res?.data?.data,
-          });
-        }
-      })
-      .catch((err) => {
-        if (err?.response?.status == "401") {
-          deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
-        } else {
-          window.scrollTo(0, 0);
-          if (err?.response?.data?.msg) {
-            console.log(err?.response?.data?.msg);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.response?.data?.msg,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
-          } else {
-            console.log(err?.message);
-            setAlert({
-              errStatus: true,
-              successStatus: false,
-              errMessage: err?.message,
-              successMessage: "",
-            });
-            setTimeout(() => {
-              setAlert({
-                errStatus: false,
-                successStatus: false,
-                errMessage: "",
-                successMessage: "",
-              });
-            }, 2000);
-          }
-        }
-      });
-  };
-
   // HANDLING API CALL METHOD
-  const addEvent = async (e) => {
+  const product = async (e) => {
     e.preventDefault();
     let token = getSession("authorization");
+    console.log("details A", details);
+
     let credentials = { ...details };
-    AddData({ url: "events/create", cred: credentials, token: token })
+    console.log("credentials", credentials);
+    AddData({ url: "occasion/create", cred: credentials, token: token })
       .then((res) => {
         window.scrollTo(0, 0);
         setDetails({
           name: "",
-          file: "",
-          group: [],
-          description: ""
+          giftList: [],
         });
-        navigate('/events')
         setAlert({
           successStatus: true,
           errStatus: false,
@@ -162,9 +96,10 @@ const AddEvent = () => {
         }, 1000);
       })
       .catch((err) => {
+        console.log(err);
         if (err?.response?.status == "401") {
           deleteSession("authorization");
-          window.location.href = `${process.env.REACT_APP_BASE_URL}`
+          window.location.href = `${process.env.REACT_APP_BASE_URL}`;
         } else {
           window.scrollTo(0, 0);
           if (err?.response?.data?.msg) {
@@ -206,7 +141,7 @@ const AddEvent = () => {
 
   return (
     <React.Fragment>
-      <form onSubmit={addEvent}>
+      <form onSubmit={product}>
         {/* INPUT PRODUCT DETAILS */}
         <div className="container-fluid row">
           {/* DISPLAY ERROR MESSAGE */}
@@ -267,7 +202,7 @@ const AddEvent = () => {
                 <div className="row g-4 mb-4">
                   <div className="col-md-6">
                     <label htmlFor="form-product/name" className="form-label">
-                      Event Name
+                      Name
                     </label>
                     <input
                       type="text"
@@ -279,64 +214,32 @@ const AddEvent = () => {
                       required
                     />
                   </div>
+
                   <div className="col-md-6">
                     <label
                       htmlFor="form-productImage/thumbnail"
                       className="form-label"
                     >
-                      Image
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-control"
-                      name="thumbnail"
-                      id="form-productImage/thumbnail"
-                      onChange={fileUpload}
-                      required
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="form-productImage/thumbnail"
-                      className="form-label "
-                    >
-                      Category
+                      Add Gift's
                     </label>
                     <Select
-                      mode="multiple"
+                      // mode="multiple"
                       allowClear
                       style={{ width: "100%" }}
-                      placeholder="Select Categories"
-                      onChange={handleCategories}
-                      options={categoriesList}
-                      className="p-0 mt-2"
-                    //value={details?.category}
+                      placeholder="Select Gift"
+                      onChange={handleSegment}
+                      options={giftList}
+                      className="p-0 mb-4"
+                      value={details?.segment}
+                      mode="tags"
                     />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="form-product/description"
-                      className="form-label"
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      id="form-product/description"
-                      name="description"
-                      className="sa-quill-control form-control sa-quill-control--ready"
-                      rows="4"
-                      value={details.description}
-                      onChange={handleDetails}
-                      required
-                    ></textarea>
                   </div>
                 </div>
                 <div className="text-center">
                   <input
                     type="submit"
                     className="btn btn-outline-primary btn-sm mb-0 px-5"
-                    value="Add Event"
+                    value="Add Occasion"
                   />
                 </div>
               </div>
@@ -348,4 +251,4 @@ const AddEvent = () => {
   );
 };
 
-export default AddEvent;
+export default AddOccassions;

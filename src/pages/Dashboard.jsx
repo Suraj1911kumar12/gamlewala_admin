@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import useSession, { deleteSession } from "../hooks/session";
 import { GetData } from "../Apis/Getters/GetData";
@@ -25,15 +24,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     let token = getSession("authorization");
-    GetData({ url: "dashboard/get-dashboard-list", token: token })
+    GetData({ url: "dashboard/dashboard-details-list", token: token })
       .then((res) => {
         // setRoles(res.data.data.roleList);
         setDashData({
-          users: res.data.data.totalUsers,
-          orders: res.data.data.totalOrders,
-          sales: res.data.data.totalAmount
-
+          users: res?.data?.data?.totalUsers,
+          orders: res?.data?.data?.totalOrders,
+          sales: res?.data?.data?.totalAmount,
         })
+        getRecentProducts(res?.data?.data?.TopSellerVendorLists)
+        setTopSellersList(res?.data?.data?.TopSellingProductLists)
+        setTopSelling(res?.data?.data?.TopSellingProductLists)
       })
       .catch((err) => {
         if (err?.response?.status == "401") {
@@ -41,43 +42,18 @@ const Dashboard = () => {
           window.location.href = `${process.env.REACT_APP_BASE_URL}`
         }
       })
-    getRecentProductsList()
-    getTopSellerList()
-    getTopSellingList()
+
   }, [alert]);
 
 
-  const getTopSellerList = () => {
-    let token = getSession("authorization");
-    GetData({ url: "dashboard/get-top-seller-list", token: token }).then((res) => {
-      setTopSellersList(res?.data?.data?.products);
-    }).catch((error) =>
-      console.log(error)
-    )
-  }
-  const getRecentProductsList = () => {
-    let token = getSession("authorization");
-    GetData({ url: "dashboard/get-recent-product-list", token: token }).then((res) => {
-      getRecentProducts(res.data.data);
-    }).catch((error) =>
-      console.log(error)
-    )
-  }
-  const getTopSellingList = () => {
-    let token = getSession("authorization");
-    GetData({ url: "dashboard/get-top-selling-product-list", token: token }).then((res) => {
-      setTopSelling(res.data.data);
-    }).catch((error) =>
-      console.log(error)
-    )
-  }
 
 
 
-  const data = [...recentProducts];
-  // console.log('top rec', data);
 
-  const sellerData = [...sellersList];
+  // const data = recentProducts;
+  // // console.log('top rec', data);
+
+  // const sellerData = sellersList;
   // console.log('top sed', sellerData);
   // const topProductData = [...topSelling];
   // console.log("top pr", topProductData);
@@ -147,19 +123,14 @@ const Dashboard = () => {
       dataIndex: "name",
     },
     {
-      title: "PRODUCT",
-      key: "product",
-      dataIndex: "product",
+      title: "Sales",
+      key: "sales",
+      dataIndex: "sales",
     },
     {
       title: "REVENUE",
-      key: "productRevenue",
-      dataIndex: "productRevenue",
-    },
-    {
-      title: "STATUS",
-      key: "status",
-      dataIndex: "status",
+      key: "totalRevenue",
+      dataIndex: "totalRevenue",
     },
   ];
 
@@ -183,6 +154,11 @@ const Dashboard = () => {
       title: "Rating",
       key: "rating",
       dataIndex: "rating",
+      render: (_, elem) => (
+        <div className=" text-left px-2 py-1">
+          {elem?.rating}
+        </div>
+      ),
     },
     {
       title: "STATUS",
@@ -190,7 +166,7 @@ const Dashboard = () => {
       dataIndex: "status",
       render: (_, elem) => (
         <div className=" text-left px-2 py-1">
-          {console.log(elem)}
+          {/* {console.log(elem)} */}
           <div className=" text-left">{elem.status == "approved" ?
             <div className="badge bg-success">{elem.status}</div>
             :
@@ -200,85 +176,6 @@ const Dashboard = () => {
       ),
     },
   ];
-
-  // GETTING DASHBOARD STATICS
-  const totalSales = orderListData?.reduce((total, current) => {
-    const sales = total + Number(current?.grandTotal);
-    return sales;
-  }, 0);
-  const averagevalue = totalSales / orderListData?.length;
-
-  // MAPPING RECENT OREDERS
-  const recentOrders = orderListData?.reverse()?.slice(0, 10).map((elem, index) => {
-    return (
-      <tr key={index + 1}>
-        {/* <td>
-          <div className="d-flex px-2 py-1">
-            <div className="d-flex flex-column justify-content-center">
-              <h6 className="mb-0 text-sm">
-                <Link to={"/orders/order/" + elem._id}>{elem?.orderNo}</Link>
-              </h6>
-            </div>
-          </div>
-        </td>
-        <td className="align-middle">
-          <div className=" text-center px-2 py-1">
-            <div className=" text-center">
-              <span className="text-sm">{elem?.customer}</span>
-            </div>
-          </div>
-        </td>
-        <td className="align-middle">
-          <div className=" text-center px-2 py-1">
-            <div className=" text-center">
-              <span className="text-sm">{elem?.customerId}</span>
-            </div>
-          </div>
-        </td>
-        <td className="align-middle">
-          <div className=" text-center px-2 py-1">
-            <div className=" text-center">
-              <span className="text-sm">
-                {new Date(elem?.createdAt).toDateString()}
-              </span>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div className="d-flex px-2 py-1">
-            <div className="d-flex flex-column justify-content-center">
-              {elem.paymentStatus == "unpaid" ?
-                <div className="badge bg-danger">{elem.paymentStatus}</div>
-                :
-                <div className="badge bg-success">{elem.paymentStatus}</div>}
-            </div>
-          </div>
-        </td>
-        <td>
-          <div className="d-flex px-2 py-1">
-            <div className="d-flex flex-column justify-content-center">
-              {elem.orderStatus == "pending" ?
-                <div className="badge bg-danger">{elem.orderStatus}</div>
-                :
-                <div className="badge bg-success">{elem.orderStatus}</div>}
-            </div>
-          </div>
-        </td>
-        <td className="align-middle">
-          <div className=" text-center px-2 py-1">
-            <div className=" text-center">
-              <span className="text-sm">
-                {elem?.grandTotal?.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "INR",
-                })}
-              </span>
-            </div>
-          </div>
-        </td> */}
-      </tr >
-    );
-  });
 
   return (
     <React.Fragment>
@@ -346,7 +243,7 @@ const Dashboard = () => {
                         Total Sales
                       </p>
                       <h5 className="font-weight-bolder mb-0">
-                        {Number(dashData?.sales)}
+                        {Number(dashData?.sales)?.toFixed(2)?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
                       </h5>
                     </div>
                   </div>
@@ -375,7 +272,7 @@ const Dashboard = () => {
             </div>
             <div className="card-body px-0 pb-2">
               <div className="table-responsive">
-                {<Datatable data={data} columns={columns} />}
+                {<Datatable data={recentProducts} columns={columns} />}
               </div>
             </div>
           </div>
@@ -389,7 +286,7 @@ const Dashboard = () => {
             </div>
             <div className="card-body px-0 pb-2">
               <div className="table-responsive">
-                {<Datatable data={sellerData} columns={sellerColumns} />}
+                {<Datatable data={sellersList} columns={sellerColumns} />}
               </div>
             </div>
           </div>

@@ -21,7 +21,7 @@ const Routing = () => {
   // LOGIN STATUS STATE
   const [loginStatus, setLoginStatus] = useState(true);
 
-  // updating component on login status update
+  // updating component on login status update`
   useEffect(() => {
     setLoginStatus(getSession("authorization"));
   }, [loginStatus]);

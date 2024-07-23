@@ -523,3 +523,51 @@ code {
   size: 594mm 841mm;
   size: 420mm 594mm;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+/* AnimatedCheckbox.css */
+
+.checkbox-container {
+  position: relative;
+  display: inline-block;
+  padding: 10px;
+}
+
+.checkbox-container .ant-checkbox-inner {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.checkbox-container.checked .ant-checkbox-inner {
+  background-color: #52c41a !important;
+  border-color: #52c41a !important;
+}
+
+.checkmark-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #52c41a;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.checkbox-container.checked .checkmark-animation {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+}
